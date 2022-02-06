@@ -3,17 +3,14 @@
     <!--  登录表单 -->
     <a-form
       :model="formState"
+      :rules="rules"
       name="normal_login"
       class="login-form"
       @finish="onFinish"
       @finishFailed="onFinishFailed"
     >
       <!--  用户名  -->
-      <a-form-item
-        label="Username"
-        name="username"
-        :rules="[{ required: true, message: 'Please input your username!' }]"
-      >
+      <a-form-item label="用户名" name="username">
         <a-input v-model:value="formState.username">
           <template #prefix>
             <UserOutlined class="site-form-item-icon" />
@@ -21,27 +18,23 @@
         </a-input>
       </a-form-item>
       <!--   密码   -->
-      <a-form-item
-        label="Password"
-        name="password"
-        :rules="[{ required: true, message: 'Please input your password!' }]"
-      >
+      <a-form-item label="密码" name="password" :labelCol="{ offset: 1 }">
         <a-input-password v-model:value="formState.password">
           <template #prefix>
             <LockOutlined class="site-form-item-icon" />
           </template>
         </a-input-password>
       </a-form-item>
-
+      <!--  登录按钮  -->
       <a-form-item>
-        <!--   登录按钮  -->
         <a-button
           :disabled="disabled"
           type="primary"
           html-type="submit"
           class="login-form-button"
+          block
         >
-          Log in
+          登录
         </a-button>
       </a-form-item>
     </a-form>
@@ -51,6 +44,7 @@
 <script>
 import { defineComponent, reactive, computed } from "vue";
 import { UserOutlined, LockOutlined } from "@ant-design/icons-vue";
+import { checkUsername, checkPassword } from "@/utils/validator";
 export default defineComponent({
   name: "loginForm",
   components: {
@@ -63,6 +57,27 @@ export default defineComponent({
       username: "",
       password: "",
     });
+    // 定义验证规则
+    const rules = {
+      // 用户名
+      username: [
+        {
+          validator: checkUsername,
+          trigger: "change",
+        },
+      ],
+      // 密码
+      password: [
+        {
+          validator: checkPassword,
+          trigger: "change",
+        },
+      ],
+    };
+    // 计算登录按钮的禁用状态
+    const disabled = computed(() => {
+      return !(formState.username && formState.password);
+    });
     // 提交表单且数据验证成功后的回调函数
     const onFinish = (values) => {
       console.log("Success:", values);
@@ -71,15 +86,13 @@ export default defineComponent({
     const onFinishFailed = (errorInfo) => {
       console.log("Failed:", errorInfo);
     };
-    // 计算登录按钮的禁用状态
-    const disabled = computed(() => {
-      return !(formState.username && formState.password);
-    });
+
     return {
       formState,
       onFinish,
       onFinishFailed,
       disabled,
+      rules,
     };
   },
 });

@@ -3,17 +3,14 @@
     <!-- 注册表单 -->
     <a-form
       :model="formState"
+      :rules="rules"
       name="normal_login"
       class="login-form"
       @finish="onFinish"
       @finishFailed="onFinishFailed"
     >
       <!--  用户名  -->
-      <a-form-item
-        label="Username"
-        name="username"
-        :rules="[{ required: true, message: 'Please input your username!' }]"
-      >
+      <a-form-item label="用户名" name="username">
         <a-input v-model:value="formState.username">
           <template #prefix>
             <UserOutlined class="site-form-item-icon" />
@@ -21,11 +18,7 @@
         </a-input>
       </a-form-item>
       <!--   密码   -->
-      <a-form-item
-        label="Password"
-        name="password"
-        :rules="[{ required: true, message: 'Please input your password!' }]"
-      >
+      <a-form-item label="密码" name="password" :labelCol="{ offset: 1 }">
         <a-input-password v-model:value="formState.password">
           <template #prefix>
             <LockOutlined class="site-form-item-icon" />
@@ -33,20 +26,16 @@
         </a-input-password>
       </a-form-item>
       <!--  用户身份 车主还是业主 -->
-      <a-form-item
-        name="identity"
-        label="identity"
-        :rules="[{ required: true }]"
-      >
+      <a-form-item label="用户身份" name="identity">
         <a-radio-group v-model:value="formState.identity">
-          <a-radio value="1">car owner</a-radio>
-          <a-radio value="2">proprietor</a-radio>
+          <a-radio value="1">车主</a-radio>
+          <a-radio value="2">业主</a-radio>
         </a-radio-group>
       </a-form-item>
       <!--  注册按钮  -->
       <a-form-item>
-        <a-button :disabled="disabled" type="primary" html-type="submit">
-          register
+        <a-button :disabled="disabled" type="primary" html-type="submit" block>
+          注册
         </a-button>
       </a-form-item>
     </a-form>
@@ -56,6 +45,7 @@
 <script>
 import { computed, reactive } from "vue";
 import { UserOutlined, LockOutlined } from "@ant-design/icons-vue";
+import { checkPassword, checkUsername } from "@/utils/validator";
 export default {
   name: "registerForm",
   components: {
@@ -69,6 +59,27 @@ export default {
       password: "",
       identity: "",
     });
+    // 定义验证规则
+    const rules = {
+      // 用户名
+      username: [
+        {
+          validator: checkUsername,
+          trigger: "change",
+        },
+      ],
+      // 密码
+      password: [
+        {
+          validator: checkPassword,
+          trigger: "change",
+        },
+      ],
+    };
+    // 计算注册按钮的禁用状态
+    const disabled = computed(() => {
+      return !(formState.username && formState.password && formState.identity);
+    });
     // 提交表单且数据验证成功后的回调函数
     const onFinish = (values) => {
       console.log("Success:", values);
@@ -77,15 +88,13 @@ export default {
     const onFinishFailed = (errorInfo) => {
       console.log("Failed:", errorInfo);
     };
-    // 计算注册按钮的禁用状态
-    const disabled = computed(() => {
-      return !(formState.username && formState.password && formState.identity);
-    });
+
     return {
       formState,
       onFinish,
       onFinishFailed,
       disabled,
+      rules,
     };
   },
 };
