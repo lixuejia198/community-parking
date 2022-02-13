@@ -43,6 +43,7 @@ export default {
   background-image: url("../../assets/background.jpeg");
   background-repeat: no-repeat;
   background-size: cover;
+  text-align: center;
 }
 
 .login .container {
