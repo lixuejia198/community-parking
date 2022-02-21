@@ -2,10 +2,14 @@
   <div class="home">
     <div class="home-left">three.js</div>
     <div class="home-center">
-      <rent-or-seek :title="title1" list-button="我要共享" />
+      <rent-or-seek :title="title1">
+        <rent-item list-button="我想使用" v-for="i in 4" :key="i" />
+      </rent-or-seek>
     </div>
     <div class="home-right">
-      <rent-or-seek :title="title2" list-button="我想使用" />
+      <rent-or-seek :title="title2">
+        <rent-item list-button="我要共享" v-for="i in 4" :key="i" />
+      </rent-or-seek>
     </div>
   </div>
 </template>
@@ -13,17 +17,18 @@
 <script>
 import RentOrSeek from "@/views/home/components/rentOrSeek";
 import { ref } from "vue";
+import RentItem from "@/views/home/components/rentItem";
 export default {
   name: "Home",
-  components: { RentOrSeek },
+  components: { RentItem, RentOrSeek },
   setup() {
     const title1 = ref({
       titleContent: "正在出租车位",
-      titleButton: "我想使用",
+      titleButton: "我要共享",
     });
     const title2 = ref({
       titleContent: "正在寻找车位",
-      titleButton: "我要共享",
+      titleButton: "我想使用",
     });
     return {
       title1,
