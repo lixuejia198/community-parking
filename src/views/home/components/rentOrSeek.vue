@@ -5,7 +5,8 @@
       <span>{{ title.titleButton }}</span>
     </div>
     <div class="rentOrSeek-list-content">
-      <slot />
+      <slot name="item" />
+      <slot name="pagination" />
     </div>
   </div>
 </template>

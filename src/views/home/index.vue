@@ -3,12 +3,30 @@
     <div class="home-left">three.js</div>
     <div class="home-center">
       <rent-or-seek :title="title1">
-        <rent-item list-button="我想使用" v-for="i in 4" :key="i" />
+        <template v-slot:item>
+          <rent-item list-button="我想使用" v-for="i in 4" :key="i" />
+        </template>
+        <template v-slot:pagination>
+          <CpPagination
+            :pageSize="rentParams.pageSize"
+            v-model:page="rentParams.page"
+            :counts="rentParams.counts"
+          />
+        </template>
       </rent-or-seek>
     </div>
     <div class="home-right">
       <rent-or-seek :title="title2">
-        <rent-item list-button="我要共享" v-for="i in 4" :key="i" />
+        <template v-slot:item>
+          <seek-item list-button="我要共享" v-for="i in 4" :key="i" />
+        </template>
+        <template v-slot:pagination>
+          <CpPagination
+            :pageSize="seekParams.pageSize"
+            v-model:page="seekParams.page"
+            :counts="seekParams.counts"
+          />
+        </template>
       </rent-or-seek>
     </div>
   </div>
@@ -18,21 +36,45 @@
 import RentOrSeek from "@/views/home/components/rentOrSeek";
 import { ref } from "vue";
 import RentItem from "@/views/home/components/rentItem";
+import SeekItem from "@/views/home/components/seekItem";
+import CpPagination from "@/components/CpPagination";
 export default {
   name: "Home",
-  components: { RentItem, RentOrSeek },
+  components: { CpPagination, SeekItem, RentItem, RentOrSeek },
   setup() {
+    // 出租车位列表标题
     const title1 = ref({
       titleContent: "正在出租车位",
       titleButton: "我要共享",
     });
+    // 寻找车位列表标题
     const title2 = ref({
       titleContent: "正在寻找车位",
       titleButton: "我想使用",
     });
+    // 出租车位列表分页参数
+    const rentParams = ref({
+      // 当前页
+      page: 1,
+      // 每页显示多少条数据
+      pageSize: 4,
+      // 总数据条数
+      counts: 24,
+    });
+    // 寻找车位列表分页参数
+    const seekParams = ref({
+      // 当前页
+      page: 1,
+      // 每页显示多少条数据
+      pageSize: 4,
+      // 总数据条数
+      counts: 24,
+    });
     return {
       title1,
       title2,
+      rentParams,
+      seekParams,
     };
   },
 };
@@ -45,21 +87,21 @@ export default {
   .home-left {
     position: absolute;
     left: 0;
-    width: 50%;
+    width: 60%;
     height: 100%;
     background-color: aquamarine;
   }
   .home-center {
     position: absolute;
-    left: 50%;
-    right: 25%;
-    width: 25%;
+    left: 60%;
+    right: 20%;
+    width: 20%;
     height: 100%;
   }
   .home-right {
     position: absolute;
     right: 0;
-    width: 25%;
+    width: 20%;
     height: 100%;
     border-left: 1px solid #dfdfdf;
     box-sizing: border-box;

@@ -28,7 +28,6 @@
       <!--  登录按钮  -->
       <a-form-item>
         <a-button
-          :disabled="disabled"
           type="primary"
           html-type="submit"
           class="login-form-button"
@@ -42,7 +41,7 @@
 </template>
 
 <script>
-import { defineComponent, reactive, computed } from "vue";
+import { defineComponent, reactive } from "vue";
 import { UserOutlined, LockOutlined } from "@ant-design/icons-vue";
 import { checkUsername, checkPassword } from "@/utils/validator";
 export default defineComponent({
@@ -74,10 +73,10 @@ export default defineComponent({
         },
       ],
     };
-    // 计算登录按钮的禁用状态
-    const disabled = computed(() => {
-      return !(formState.username && formState.password);
-    });
+    // // 计算登录按钮的禁用状态
+    // const disabled = computed(() => {
+    //   return !(formState.username && formState.password);
+    // });
     // 提交表单且数据验证成功后的回调函数
     const onFinish = (values) => {
       console.log("Success:", values);
@@ -91,7 +90,6 @@ export default defineComponent({
       formState,
       onFinish,
       onFinishFailed,
-      disabled,
       rules,
     };
   },

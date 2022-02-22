@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { computed, reactive } from "vue";
+import { reactive } from "vue";
 import { UserOutlined, LockOutlined } from "@ant-design/icons-vue";
 import { checkPassword, checkUsername } from "@/utils/validator";
 export default {
@@ -76,10 +76,10 @@ export default {
         },
       ],
     };
-    // 计算注册按钮的禁用状态
-    const disabled = computed(() => {
-      return !(formState.username && formState.password && formState.identity);
-    });
+    // // 计算注册按钮的禁用状态
+    // const disabled = computed(() => {
+    //   return !(formState.username && formState.password && formState.identity);
+    // });
     // 提交表单且数据验证成功后的回调函数
     const onFinish = (values) => {
       console.log("Success:", values);
@@ -93,7 +93,6 @@ export default {
       formState,
       onFinish,
       onFinishFailed,
-      disabled,
       rules,
     };
   },
