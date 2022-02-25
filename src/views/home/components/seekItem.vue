@@ -2,11 +2,11 @@
   <div class="rentOrSeek-list-content-item">
     <div class="rentOrSeek-list-content-number">
       <h3>168号</h3>
-      <span>{{ listButton }}</span>
+      <span @click="showModel">{{ listButton }}</span>
     </div>
     <div class="rentOrSeek-list-content-state">
       <span>状态</span>
-      <p>空闲</p>
+      <p>未解决</p>
     </div>
     <div class="rentOrSeek-list-content-time">
       <span>时间</span>
@@ -17,15 +17,44 @@
       <p>佛山岭南隽庭</p>
     </div>
   </div>
+  <a-modal
+    v-model:visible="visible"
+    title="温馨提示"
+    cancelText="取消"
+    okText="确定"
+    @ok="handleOk"
+  >
+    <p>您确定要共享这个车位吗？</p>
+  </a-modal>
 </template>
 
 <script>
+import { ref } from "vue";
+
 export default {
   name: "seekItem",
   props: {
     listButton: {
       type: String,
     },
+  },
+  setup() {
+    // 控制弹框的显示与隐藏
+    const visible = ref(false);
+    // 显示弹框
+    const showModel = () => {
+      visible.value = true;
+    };
+    // 点击弹框的确定按钮的回调事件
+    const handleOk = (e) => {
+      console.log(e);
+    };
+
+    return {
+      visible,
+      showModel,
+      handleOk,
+    };
   },
 };
 </script>

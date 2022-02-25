@@ -5,7 +5,6 @@
       :model="formState"
       :rules="rules"
       name="normal_login"
-      class="login-form"
       @finish="onFinish"
       @finishFailed="onFinishFailed"
     >
@@ -99,9 +98,8 @@ export default defineComponent({
 <style scoped lang="less">
 .login-form {
   width: 100%;
-  //height: 240px;
   border-radius: 10px;
-  padding-top: 15px;
+  padding-top: 30px;
   box-sizing: border-box;
 }
 #components-form-demo-normal-login {

@@ -14,6 +14,7 @@ const routes = [
     name: "Login",
     component: LoginPage,
   },
+  // 个人中心模块
 ];
 
 const router = createRouter({

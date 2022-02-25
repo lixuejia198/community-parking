@@ -44,7 +44,7 @@ export default {
   position: relative;
   background-image: url("../../assets/01.jpeg");
   background-repeat: no-repeat;
-  background-size: auto;
+  background-size: cover;
   text-align: center;
   .container {
     padding-top: 200px;

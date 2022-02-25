@@ -116,7 +116,6 @@ export default {
   display: flex;
   justify-content: center;
   padding: 30px;
-  margin-top: 30px;
   > a {
     display: inline-block;
     padding: 5px 10px;

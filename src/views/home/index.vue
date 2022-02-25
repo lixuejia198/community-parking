@@ -1,33 +1,41 @@
 <template>
   <div class="home">
-    <div class="home-left">three.js</div>
-    <div class="home-center">
-      <rent-or-seek :title="title1">
-        <template v-slot:item>
-          <rent-item list-button="我想使用" v-for="i in 4" :key="i" />
-        </template>
-        <template v-slot:pagination>
-          <CpPagination
-            :pageSize="rentParams.pageSize"
-            v-model:page="rentParams.page"
-            :counts="rentParams.counts"
-          />
-        </template>
-      </rent-or-seek>
-    </div>
-    <div class="home-right">
-      <rent-or-seek :title="title2">
-        <template v-slot:item>
-          <seek-item list-button="我要共享" v-for="i in 4" :key="i" />
-        </template>
-        <template v-slot:pagination>
-          <CpPagination
-            :pageSize="seekParams.pageSize"
-            v-model:page="seekParams.page"
-            :counts="seekParams.counts"
-          />
-        </template>
-      </rent-or-seek>
+    <!--  用户登录信息  -->
+    <div class="login-info">用户登录信息</div>
+    <!--  首页内容  -->
+    <div class="home-content">
+      <!-- 基于three.js的停车车位模型 -->
+      <div class="home-left">three.js</div>
+      <!-- 出租车位 -->
+      <div class="home-center">
+        <rent-or-seek :title="rentTitle">
+          <template v-slot:item>
+            <rent-item list-button="我想使用" v-for="i in 4" :key="i" />
+          </template>
+          <template v-slot:pagination>
+            <CpPagination
+              :pageSize="rentParams.pageSize"
+              v-model:page="rentParams.page"
+              :counts="rentParams.counts"
+            />
+          </template>
+        </rent-or-seek>
+      </div>
+      <!-- 寻找车位 -->
+      <div class="home-right">
+        <rent-or-seek :title="seekTitle">
+          <template v-slot:item>
+            <seek-item list-button="我要共享" v-for="i in 4" :key="i" />
+          </template>
+          <template v-slot:pagination>
+            <CpPagination
+              :pageSize="seekParams.pageSize"
+              v-model:page="seekParams.page"
+              :counts="seekParams.counts"
+            />
+          </template>
+        </rent-or-seek>
+      </div>
     </div>
   </div>
 </template>
@@ -43,12 +51,12 @@ export default {
   components: { CpPagination, SeekItem, RentItem, RentOrSeek },
   setup() {
     // 出租车位列表标题
-    const title1 = ref({
+    const rentTitle = ref({
       titleContent: "正在出租车位",
       titleButton: "我要共享",
     });
     // 寻找车位列表标题
-    const title2 = ref({
+    const seekTitle = ref({
       titleContent: "正在寻找车位",
       titleButton: "我想使用",
     });
@@ -70,9 +78,10 @@ export default {
       // 总数据条数
       counts: 24,
     });
+
     return {
-      title1,
-      title2,
+      rentTitle,
+      seekTitle,
       rentParams,
       seekParams,
     };
@@ -83,28 +92,47 @@ export default {
 <style scoped lang="less">
 .home {
   height: 100%;
-  position: relative;
-  .home-left {
-    position: absolute;
-    left: 0;
-    width: 60%;
-    height: 100%;
-    background-color: aquamarine;
+  .login-info {
+    height: 50px;
+    border-bottom: 1px solid #ccc;
   }
-  .home-center {
-    position: absolute;
-    left: 60%;
-    right: 20%;
-    width: 20%;
-    height: 100%;
-  }
-  .home-right {
-    position: absolute;
-    right: 0;
-    width: 20%;
-    height: 100%;
-    border-left: 1px solid #dfdfdf;
-    box-sizing: border-box;
+  .home-content {
+    height: calc(100% - 50px);
+    position: relative;
+    .home-left {
+      position: absolute;
+      left: 0;
+      width: 60%;
+      height: 100%;
+      background-color: aquamarine;
+    }
+    .home-center {
+      position: absolute;
+      left: 60%;
+      right: 20%;
+      width: 20%;
+      height: 100%;
+      a {
+        display: inline-block;
+        color: #d46b08;
+        width: 100%;
+        height: 100%;
+      }
+    }
+    .home-right {
+      position: absolute;
+      right: 0;
+      width: 20%;
+      height: 100%;
+      border-left: 1px solid #ccc;
+      box-sizing: border-box;
+      a {
+        display: inline-block;
+        color: #d46b08;
+        width: 100%;
+        height: 100%;
+      }
+    }
   }
 }
 </style>

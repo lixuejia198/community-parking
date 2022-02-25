@@ -5,7 +5,6 @@
       :model="formState"
       :rules="rules"
       name="normal_login"
-      class="login-form"
       @finish="onFinish"
       @finishFailed="onFinishFailed"
     >
@@ -25,18 +24,9 @@
           </template>
         </a-input-password>
       </a-form-item>
-      <!--  用户身份 车主还是业主 -->
-      <a-form-item label="用户身份" name="identity">
-        <a-radio-group v-model:value="formState.identity">
-          <a-radio value="1">车主</a-radio>
-          <a-radio value="2">业主</a-radio>
-        </a-radio-group>
-      </a-form-item>
       <!--  注册按钮  -->
       <a-form-item>
-        <a-button :disabled="disabled" type="primary" html-type="submit" block>
-          注册
-        </a-button>
+        <a-button type="primary" html-type="submit" block> 注册 </a-button>
       </a-form-item>
     </a-form>
   </div>
@@ -102,9 +92,8 @@ export default {
 <style scoped lang="less">
 .register-form {
   width: 100%;
-  //height: 240px;
   border-radius: 10px;
-  padding-top: 15px;
+  padding-top: 30px;
   box-sizing: border-box;
 }
 #components-form-demo-normal-login {

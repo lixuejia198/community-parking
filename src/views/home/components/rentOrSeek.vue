@@ -38,14 +38,17 @@ export default {
       color: #d46b08;
       background: #fff7e6;
       border: 1px solid #ffd591;
-      padding: 8px;
+      width: 74px;
+      height: 40px;
+      text-align: center;
+      line-height: 40px;
       cursor: pointer;
     }
   }
   .rentOrSeek-list-content {
     padding: 10px;
     background-color: #edf2f7;
-    height: calc(937px - 65px);
+    height: calc(937px - 115px);
   }
 }
 </style>
