@@ -8,7 +8,7 @@
         <!-- 登录组件  -->
         <login-form v-if="isLoginForm" />
         <!-- 注册组件  -->
-        <register-form v-if="!isLoginForm" />
+        <register-form v-if="!isLoginForm" @changeComponent="changeComponent" />
         <a href="javascript:" v-if="isLoginForm" @click="isLoginForm = false">
           没有账号？立即注册
         </a>
@@ -30,8 +30,14 @@ export default {
   setup() {
     // 定义一个控制登录组件和注册组件显示的变量
     const isLoginForm = ref(true);
+    // 用来切换组件的(登录组件和注册组件之间的切换)
+    const changeComponent = (e) => {
+      // console.log(e);
+      isLoginForm.value = e;
+    };
     return {
       isLoginForm,
+      changeComponent,
     };
   },
 };

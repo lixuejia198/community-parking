@@ -5,10 +5,10 @@ export let checkUsername = async (_rule, value) => {
   if (!value) {
     return Promise.reject("请输入您的用户名！");
   }
-  // 定义用户名正则
-  let reg = /^[a-zA-Z0-9_-]{4,11}$/;
+  // 定义用户名正则 只含有汉字、数字、字母、下划线，下划线位置不限
+  let reg = /^[a-zA-Z0-9_\u4e00-\u9fa5]{4,20}$/;
   if (!reg.test(value)) {
-    return Promise.reject("用户名长度在4到11之间，且不能为中文");
+    return Promise.reject("用户名长度在4到20之间");
   }
 };
 // 验证密码

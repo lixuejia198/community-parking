@@ -6,8 +6,8 @@
     </div>
     <div class="rentOrSeek-list-content">
       <slot name="item" />
-      <slot name="pagination" />
     </div>
+    <slot name="pagination" />
   </div>
 </template>
 
@@ -31,6 +31,7 @@ export default {
     justify-content: space-between;
     padding: 0 10px 10px;
     height: 50px;
+    border-bottom: 1px solid #ccc;
     h3 {
       line-height: 38px;
     }
@@ -47,8 +48,10 @@ export default {
   }
   .rentOrSeek-list-content {
     padding: 10px;
-    background-color: #edf2f7;
-    height: calc(937px - 115px);
+    // background-color: #edf2f7;
+    height: calc(937px - 115px - 94px);
+    // 超出范围垂直显示滚动条
+    overflow-y: scroll;
   }
 }
 </style>

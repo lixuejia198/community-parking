@@ -4,18 +4,18 @@
       <h3>168号</h3>
       <span @click="showModel">{{ listButton }}</span>
     </div>
-    <div class="rentOrSeek-list-content-state">
-      <span>状态</span>
-      <p>未解决</p>
-    </div>
-    <div class="rentOrSeek-list-content-time">
-      <span>时间</span>
-      <p>可使用时间为2022年2月20日-2022年3月10日</p>
-    </div>
-    <div class="rentOrSeek-list-content-place">
-      <span>位置</span>
-      <p>佛山岭南隽庭</p>
-    </div>
+    <a-row class="rentOrSeek-list-content-state">
+      <a-col :span="3"><span>状态</span></a-col>
+      <a-col :span="21"><p>未解决</p></a-col>
+    </a-row>
+    <a-row class="rentOrSeek-list-content-time">
+      <a-col :span="3"><span>时间</span></a-col>
+      <a-col :span="21"><p>可使用时间为2022年2月20日-2022年3月10日</p></a-col>
+    </a-row>
+    <a-row class="rentOrSeek-list-content-place">
+      <a-col :span="3"><span>位置</span></a-col>
+      <a-col :span="21"><p>佛山岭南隽庭</p></a-col>
+    </a-row>
   </div>
   <a-modal
     v-model:visible="visible"
@@ -90,7 +90,6 @@ export default {
   .rentOrSeek-list-content-state,
   .rentOrSeek-list-content-time,
   .rentOrSeek-list-content-place {
-    display: flex;
     margin-bottom: 10px;
     padding-left: 8px;
     span {
@@ -100,7 +99,7 @@ export default {
     }
     p {
       padding: 2px 0;
-      margin: 0 0 0 8px;
+      margin: 0;
     }
   }
   .rentOrSeek-list-content-time {

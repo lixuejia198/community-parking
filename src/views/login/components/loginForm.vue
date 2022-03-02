@@ -6,7 +6,6 @@
       :rules="rules"
       name="normal_login"
       @finish="onFinish"
-      @finishFailed="onFinishFailed"
     >
       <!--  用户名  -->
       <a-form-item label="用户名" name="username">
@@ -43,6 +42,10 @@
 import { defineComponent, reactive } from "vue";
 import { UserOutlined, LockOutlined } from "@ant-design/icons-vue";
 import { checkUsername, checkPassword } from "@/utils/validator";
+import { loginByUsernameAndPassword } from "@/api/user";
+import { useRouter } from "vue-router";
+import { message } from "ant-design-vue";
+
 export default defineComponent({
   name: "loginForm",
   components: {
@@ -72,23 +75,39 @@ export default defineComponent({
         },
       ],
     };
-    // // 计算登录按钮的禁用状态
-    // const disabled = computed(() => {
-    //   return !(formState.username && formState.password);
-    // });
+    // 获取路由对象
+    const router = useRouter();
     // 提交表单且数据验证成功后的回调函数
     const onFinish = (values) => {
-      console.log("Success:", values);
-    };
-    // 提交表单且数据验证失败后的回调函数
-    const onFinishFailed = (errorInfo) => {
-      console.log("Failed:", errorInfo);
+      // console.log("Success:", values);
+      const { username, password } = values;
+      // 用户登录
+      loginByUsernameAndPassword({ username, password })
+        .then((data) => {
+          console.log(data, "data");
+          // 如果返回的状态码为200
+          if (data.status === 200) {
+            // 把token存入localStorage中
+            window.localStorage.setItem("community-parking", data.token);
+            // 跳转到首页
+            router.push("/");
+            // 提示登录成功信息
+            message.success(data.msg);
+          }
+          // 如果状态码为0
+          if (data.status === 0) {
+            // 提示错误信息
+            message.error(data.msg);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     };
 
     return {
       formState,
       onFinish,
-      onFinishFailed,
       rules,
     };
   },

@@ -6,7 +6,6 @@
       :rules="rules"
       name="normal_login"
       @finish="onFinish"
-      @finishFailed="onFinishFailed"
     >
       <!--  用户名  -->
       <a-form-item label="用户名" name="username">
@@ -36,18 +35,20 @@
 import { reactive } from "vue";
 import { UserOutlined, LockOutlined } from "@ant-design/icons-vue";
 import { checkPassword, checkUsername } from "@/utils/validator";
+import { registerByUsernameAndPassword } from "@/api/user";
+import { message } from "ant-design-vue";
 export default {
   name: "registerForm",
   components: {
     UserOutlined,
     LockOutlined,
   },
-  setup() {
+  setup(props, { emit }) {
+    console.log(props, emit);
     // 定义表单字段 并双向绑定
     const formState = reactive({
       username: "",
       password: "",
-      identity: "",
     });
     // 定义验证规则
     const rules = {
@@ -66,23 +67,33 @@ export default {
         },
       ],
     };
-    // // 计算注册按钮的禁用状态
-    // const disabled = computed(() => {
-    //   return !(formState.username && formState.password && formState.identity);
-    // });
     // 提交表单且数据验证成功后的回调函数
     const onFinish = (values) => {
       console.log("Success:", values);
-    };
-    // 提交表单且数据验证失败后的回调函数
-    const onFinishFailed = (errorInfo) => {
-      console.log("Failed:", errorInfo);
+      const { username, password } = values;
+      // 用户注册
+      registerByUsernameAndPassword({ username, password })
+        .then((data) => {
+          console.log(data, "data");
+          // 如果返回的状态码为200
+          if (data.status === 200) {
+            // 切换到登录组件
+            emit("changeComponent", true);
+            // 提示注册成功信息
+            message.success(data.msg);
+          }
+          // 如果返回的状态码为0
+          if (data.status === 0) {
+            // 提示错误信息
+            message.error(data.msg);
+          }
+        })
+        .catch();
     };
 
     return {
       formState,
       onFinish,
-      onFinishFailed,
       rules,
     };
   },

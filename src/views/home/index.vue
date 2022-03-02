@@ -10,7 +10,7 @@
       <div class="home-center">
         <rent-or-seek :title="rentTitle">
           <template v-slot:item>
-            <rent-item list-button="我想使用" v-for="i in 4" :key="i" />
+            <rent-item list-button="我想使用" v-for="i in 10" :key="i" />
           </template>
           <template v-slot:pagination>
             <CpPagination
@@ -25,7 +25,7 @@
       <div class="home-right">
         <rent-or-seek :title="seekTitle">
           <template v-slot:item>
-            <seek-item list-button="我要共享" v-for="i in 4" :key="i" />
+            <seek-item list-button="我要共享" v-for="i in 10" :key="i" />
           </template>
           <template v-slot:pagination>
             <CpPagination
