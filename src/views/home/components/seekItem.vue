@@ -1,20 +1,29 @@
 <template>
   <div class="rentOrSeek-list-content-item">
     <div class="rentOrSeek-list-content-number">
-      <h3>168号</h3>
+      <h3>{{ seek.name }}</h3>
       <span @click="showModel">{{ listButton }}</span>
     </div>
     <a-row class="rentOrSeek-list-content-state">
       <a-col :span="3"><span>状态</span></a-col>
-      <a-col :span="21"><p>未解决</p></a-col>
+      <a-col :span="21">
+        <p>{{ seek.state === 0 ? "未解决" : "已解决" }}</p>
+      </a-col>
     </a-row>
     <a-row class="rentOrSeek-list-content-time">
       <a-col :span="3"><span>时间</span></a-col>
-      <a-col :span="21"><p>可使用时间为2022年2月20日-2022年3月10日</p></a-col>
+      <a-col :span="21">
+        <p>
+          可使用时间为{{ new Date(seek.starttime).toLocaleString() }}-
+          {{ new Date(seek.endtime).toLocaleString() }}
+        </p>
+      </a-col>
     </a-row>
     <a-row class="rentOrSeek-list-content-place">
       <a-col :span="3"><span>位置</span></a-col>
-      <a-col :span="21"><p>佛山岭南隽庭</p></a-col>
+      <a-col :span="21">
+        <p>{{ seek.comname }}({{ seek.place }})</p>
+      </a-col>
     </a-row>
   </div>
   <a-modal
@@ -36,6 +45,9 @@ export default {
   props: {
     listButton: {
       type: String,
+    },
+    seek: {
+      type: Object,
     },
   },
   setup() {
@@ -95,7 +107,8 @@ export default {
     span {
       background-color: rgb(255, 85, 0);
       color: white;
-      padding: 2px;
+      padding: 1px;
+      display: inline-block;
     }
     p {
       padding: 2px 0;
