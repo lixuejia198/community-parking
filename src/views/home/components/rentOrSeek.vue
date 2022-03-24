@@ -16,7 +16,20 @@
     okText="确定"
     @ok="handleOk"
   >
-    <p>{{ catportList }}</p>
+    <div
+      v-for="catpor in catportList"
+      :key="catpor.id"
+      class="modal-com-item"
+      :class="{
+        active: selectCarport.id === catpor.id,
+      }"
+      @click="selectCarportList(catpor)"
+    >
+      <p>ID:{{ catpor.id }}</p>
+      <p>车位编码：{{ catpor.pname }}</p>
+      <p>所在花园：{{ catpor.comname }}</p>
+      <p>地址：{{ catpor.place }}</p>
+    </div>
   </a-modal>
 </template>
 
@@ -50,12 +63,23 @@ export default {
       getData(1);
     };
 
+    // 选中的车位
+    const selectCarport = ref({});
+
+    // 选中车位
+    const selectCarportList = (carport) => {
+      selectCarport.value =
+        selectCarport.value.id === carport.id ? {} : carport;
+    };
+
     return {
       hhh,
       visible,
       showModel,
       handleOk,
       catportList,
+      selectCarport,
+      selectCarportList,
     };
   },
 };
@@ -113,9 +137,31 @@ const useCarport = () => {
   .rentOrSeek-list-content {
     padding: 10px;
     // background-color: #edf2f7;
-    height: calc(937px - 115px - 94px);
+    height: calc(100% - 130px);
     // 超出范围垂直显示滚动条(auto是溢出才显示滚动条)
     overflow-y: auto;
   }
+}
+
+.modal-com-item {
+  border-bottom: 2px solid #dfdfdf;
+  box-shadow: 0 6.1px 2px rgba(0, 0, 0, 0.025),
+    0 10.6px 6.7px rgba(0, 0, 0, 0.036), 0 25px 30px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  border-radius: 20px;
+  padding: 10px;
+  margin-bottom: 10px;
+
+  &:hover {
+    background-color: #fff7e6;
+    border: 1px solid #ffd591;
+    color: #000;
+  }
+}
+
+.active {
+  background-color: #d46b08;
+  border: 1px solid #ffd591;
+  color: #fff;
 }
 </style>
