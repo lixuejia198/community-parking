@@ -9,6 +9,11 @@
       <!-- 出租车位 -->
       <div class="home-center">
         <rent-or-seek :title="rentTitle">
+          <template v-slot:button>
+            <span class="rentlist-button" @click="rentCarport">
+              {{ rentTitle.titleButton }}
+            </span>
+          </template>
           <template v-slot:item>
             <rent-item
               list-button="我想使用"
@@ -29,6 +34,9 @@
       <!-- 寻找车位 -->
       <div class="home-right">
         <rent-or-seek :title="seekTitle">
+          <template v-slot:button>
+            <span class="seeklist-button">{{ seekTitle.titleButton }}</span>
+          </template>
           <template v-slot:item>
             <seek-item
               list-button="我要共享"
@@ -48,6 +56,28 @@
       </div>
     </div>
   </div>
+  <a-modal
+    v-model:visible="rentVisible"
+    title="请选择你要共享的车位"
+    cancelText="取消"
+    okText="确定"
+    @ok="handleOkRent"
+  >
+    <div
+      v-for="carport in carportList"
+      :key="carport.id"
+      class="modal-com-item"
+      :class="{
+        active: selectCarport.id === carport.id,
+      }"
+      @click="selectCarportList(carport)"
+    >
+      <p>ID：{{ carport.id }}</p>
+      <p>车位编码：{{ carport.pname }}</p>
+      <p>所在花园：{{ carport.comname }}</p>
+      <p>地址：{{ carport.place }}</p>
+    </div>
+  </a-modal>
 </template>
 
 <script>
@@ -56,7 +86,7 @@ import { ref, watch } from "vue";
 import RentItem from "@/views/home/components/rentItem";
 import SeekItem from "@/views/home/components/seekItem";
 import CpPagination from "@/components/CpPagination";
-import { getRentlist, getSeeklist } from "@/api/index";
+import { getCarport, getRentlist, getSeeklist } from "@/api/index";
 export default {
   name: "Home",
   components: { CpPagination, SeekItem, RentItem, RentOrSeek },
@@ -75,6 +105,27 @@ export default {
     const { rentList, rentListCount, rentParams } = useRentlist();
     // 关于寻找车位列表
     const { seekList, seekListCount, seekParams } = useSeeklist();
+    // 控制弹框的显示与隐藏
+    const rentVisible = ref(false);
+    // 关于用户车位信息列表
+    const { carportList, getData } = useCarport();
+    // 点击我要共享按钮 显示车位信息弹框
+    const rentCarport = () => {
+      // 显示弹框
+      rentVisible.value = true;
+      getData(1);
+    };
+    // 选中的车位
+    const selectCarport = ref({});
+    // 选中车位
+    const selectCarportList = (carport) => {
+      selectCarport.value =
+        selectCarport.value.id === carport.id ? {} : carport;
+    };
+    // 点击弹框的确定按钮的回调事件
+    const handleOkRent = (e) => {
+      console.log(e);
+    };
 
     return {
       rentTitle,
@@ -85,6 +136,12 @@ export default {
       rentListCount,
       seekListCount,
       seekList,
+      rentCarport,
+      rentVisible,
+      handleOkRent,
+      carportList,
+      selectCarport,
+      selectCarportList,
     };
   },
 };
@@ -178,6 +235,30 @@ function useSeeklist() {
     seekParams,
   };
 }
+// 获取用户车位数据
+const useCarport = () => {
+  // 车位列表
+  const carportList = ref([]);
+  // 根据用户id 获取车位信息
+  const getData = (uid) => {
+    getCarport({ uid })
+      .then((data) => {
+        console.log(data, "data");
+        // 如果返回的状态码为200
+        if (data.status === 200) {
+          carportList.value = data.data;
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  return {
+    carportList,
+    getData,
+  };
+};
 </script>
 
 <style scoped lang="less">
@@ -209,6 +290,16 @@ function useSeeklist() {
         width: 100%;
         height: 100%;
       }
+      .rentlist-button {
+        color: #d46b08;
+        background: #fff7e6;
+        border: 1px solid #ffd591;
+        width: 74px;
+        height: 40px;
+        text-align: center;
+        line-height: 40px;
+        cursor: pointer;
+      }
     }
     .home-right {
       position: absolute;
@@ -223,7 +314,39 @@ function useSeeklist() {
         width: 100%;
         height: 100%;
       }
+      .seeklist-button {
+        color: #d46b08;
+        background: #fff7e6;
+        border: 1px solid #ffd591;
+        width: 74px;
+        height: 40px;
+        text-align: center;
+        line-height: 40px;
+        cursor: pointer;
+      }
     }
   }
+}
+
+.modal-com-item {
+  border-bottom: 2px solid #dfdfdf;
+  box-shadow: 0 6.1px 2px rgba(0, 0, 0, 0.025),
+    0 10.6px 6.7px rgba(0, 0, 0, 0.036), 0 25px 30px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  border-radius: 20px;
+  padding: 10px;
+  margin-bottom: 10px;
+
+  &:hover {
+    background-color: #fff7e6;
+    border: 1px solid #ffd591;
+    color: #000;
+  }
+}
+
+.active {
+  background-color: #d46b08;
+  border: 1px solid #ffd591;
+  color: #fff;
 }
 </style>
