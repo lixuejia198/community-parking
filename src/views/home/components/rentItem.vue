@@ -1,7 +1,7 @@
 <template>
   <div class="rentOrSeek-list-content-item">
     <div class="rentOrSeek-list-content-number">
-      <h3>{{ rent.name }}</h3>
+      <h3>{{ rent.pname }}</h3>
       <span @click="showModel">{{ listButton }}</span>
     </div>
     <a-row class="rentOrSeek-list-content-state">

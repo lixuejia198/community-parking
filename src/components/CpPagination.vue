@@ -66,7 +66,7 @@ export default {
     // 页面中显示的页码个数
     // 当数据比较多时 会有很多页数据 不能一次性将所有页码展示出来 用户体验不好
     // 当数据比较少时 如果页码数量小于页面中规定的要显示的页码数量 此时有多少页码就显示多少页码
-    const pageButtonNumber = 5;
+    const pageButtonNumber = 4;
     // 根据页码个数计算偏移量
     const pageOffset = Math.floor(pageButtonNumber / 2);
     // 当前页发生变化时重新计算页码(用户点击更新页码时)
