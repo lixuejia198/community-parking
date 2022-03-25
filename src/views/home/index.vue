@@ -1,7 +1,17 @@
 <template>
   <div class="home">
     <!--  用户登录信息  -->
-    <div class="login-info">用户登录信息</div>
+    <div class="login-info">
+      <ul>
+        <li>
+          <RouterLink to="/my">
+            <UserOutlined />{{ userInfo.username }}
+          </RouterLink>
+        </li>
+        <li>退出登录</li>
+        <li>请先登录</li>
+      </ul>
+    </div>
     <!--  首页内容  -->
     <div class="home-content">
       <!-- 基于three.js的停车车位模型 -->
@@ -87,10 +97,14 @@ import RentItem from "@/views/home/components/rentItem";
 import SeekItem from "@/views/home/components/seekItem";
 import CpPagination from "@/components/CpPagination";
 import { getCarport, getRentlist, getSeeklist } from "@/api/index";
+import { UserOutlined } from "@ant-design/icons-vue";
+import { message } from "ant-design-vue";
+import { getUserInfo } from "@/utils/getUserInfo";
 export default {
   name: "Home",
-  components: { CpPagination, SeekItem, RentItem, RentOrSeek },
+  components: { CpPagination, SeekItem, RentItem, RentOrSeek, UserOutlined },
   setup() {
+    const userInfo = ref(getUserInfo());
     // 出租车位列表标题
     const rentTitle = ref({
       titleContent: "正在出租车位",
@@ -102,18 +116,24 @@ export default {
       titleButton: "我想使用",
     });
     // 关于出租车位列表
-    const { rentList, rentListCount, rentParams } = useRentlist();
+    const { rentList, rentListCount, rentParams } = useRentList();
     // 关于寻找车位列表
-    const { seekList, seekListCount, seekParams } = useSeeklist();
+    const { seekList, seekListCount, seekParams } = useSeekList();
     // 控制弹框的显示与隐藏
     const rentVisible = ref(false);
     // 关于用户车位信息列表
     const { carportList, getData } = useCarport();
     // 点击我要共享按钮 显示车位信息弹框
-    const rentCarport = () => {
-      // 显示弹框
-      rentVisible.value = true;
-      getData(1);
+    const rentCarport = async () => {
+      await getData(userInfo.value.id);
+      // 如果用户拥有车位
+      if (carportList.value.length !== 0) {
+        // 显示弹框
+        rentVisible.value = true;
+      } else {
+        // 如果用户没有车位 提示警告信息
+        message.warning("您还没有车位！");
+      }
     };
     // 选中的车位
     const selectCarport = ref({});
@@ -142,11 +162,12 @@ export default {
       carportList,
       selectCarport,
       selectCarportList,
+      userInfo,
     };
   },
 };
 // 获取出租车位列表数据
-function useRentlist() {
+function useRentList() {
   // 出租车位列表
   const rentList = ref(null);
   // 出租车位列表总数量
@@ -191,7 +212,7 @@ function useRentlist() {
   };
 }
 // 获取寻找车位列表数据
-function useSeeklist() {
+function useSeekList() {
   // 寻找车位列表
   const seekList = ref(null);
   // 寻找车位列表总数量
@@ -236,29 +257,27 @@ function useSeeklist() {
   };
 }
 // 获取用户车位数据
-const useCarport = () => {
+function useCarport() {
   // 车位列表
   const carportList = ref([]);
   // 根据用户id 获取车位信息
-  const getData = (uid) => {
-    getCarport({ uid })
-      .then((data) => {
-        console.log(data, "data");
-        // 如果返回的状态码为200
-        if (data.status === 200) {
-          carportList.value = data.data;
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const getData = async (uid) => {
+    const data = await getCarport({ uid }).catch((error) => {
+      console.log(error);
+    });
+    // console.log(data, "data");
+    // 如果返回的状态码为200
+    if (data.status === 200) {
+      // 存储用户车位信息
+      carportList.value = data.data;
+    }
   };
 
   return {
     carportList,
     getData,
   };
-};
+}
 </script>
 
 <style scoped lang="less">
@@ -267,6 +286,20 @@ const useCarport = () => {
   .login-info {
     height: 50px;
     border-bottom: 1px solid #ccc;
+    ul {
+      height: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 0;
+      margin: 0;
+      li {
+        list-style: none;
+        padding: 0 20px 0 6px;
+        border-left: 2px solid #ff7300;
+        font-size: 16px;
+      }
+    }
   }
   .home-content {
     height: calc(100% - 50px);
