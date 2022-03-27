@@ -21,7 +21,7 @@
     <!--  首页内容  -->
     <div class="home-content">
       <!-- 基于three.js的停车车位模型 -->
-      <div class="home-left">three.js</div>
+      <div class="three-canvas home-left" ref="threeRef"></div>
       <!-- 出租车位 -->
       <div class="home-center">
         <rent-or-seek :title="rentTitle">
@@ -84,8 +84,11 @@
       :key="carport.id"
       class="modal-com-item"
       :class="{
-        active: selectCarport.id === carport.id,
+        active: selectCarport.id === carport.id && carport.state === 0,
+        disabled: carport.state === 1,
       }"
+      @mouseenter="(e) => e.target.classList.add('hover')"
+      @mouseleave="(e) => e.target.classList.remove('hover')"
       @click="selectCarportList(carport)"
     >
       <p>ID：{{ carport.id }}</p>
@@ -98,15 +101,19 @@
 
 <script>
 import RentOrSeek from "@/views/home/components/rentOrSeek";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import RentItem from "@/views/home/components/rentItem";
 import SeekItem from "@/views/home/components/seekItem";
 import CpPagination from "@/components/CpPagination";
-import { getCarport, getRentlist, getSeeklist } from "@/api/index";
+import { getCarport, getRentlist, getSeeklist } from "@/api";
 import { UserOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { getUserInfo } from "@/utils/getUserInfo";
 import { useRouter } from "vue-router";
+import { useTEngine } from "@/hooks/useTEngine";
+import { useCarModel } from "@/hooks/useCar";
+import { Color } from "three";
+
 export default {
   name: "Home",
   components: { CpPagination, SeekItem, RentItem, RentOrSeek, UserOutlined },
@@ -155,13 +162,47 @@ export default {
     const selectCarport = ref({});
     // 选中车位
     const selectCarportList = (carport) => {
-      selectCarport.value =
-        selectCarport.value.id === carport.id ? {} : carport;
+      if (selectCarport.value.id > 0) {
+        // 如果当前是否选中车位 如果选中则取消选中
+        selectCarport.value = {};
+      } else if (carport.id !== 0 && carport.state === 0) {
+        // 如果当前车位未被选中并且车位不处于禁用状态则选中
+        selectCarport.value = carport;
+      }
     };
     // 点击弹框的确定按钮的回调事件
     const handleOkRent = (e) => {
       console.log(e);
     };
+
+    // three 绑定的元素
+    const threeRef = ref(null);
+    // 实例化的 ThreeJS 引擎
+    let TE = null;
+    // DOM 渲染完成后执行
+    onMounted(() => {
+      TE = useTEngine(threeRef.value);
+
+      // 自动调整渲染器大小
+      window.onresize = () => {
+        return (() => {
+          // 设置正投影相机大小
+          TE.setOrthographicCameraSize(
+            document.body.clientWidth,
+            document.body.clientHeight
+          );
+        })();
+      };
+
+      const car = { name: "car-red" };
+      // 渲染货物模型
+      useCarModel({ car, groupScale: 8, color: new Color(0xff7300) }).then(
+        (goodsModel) => {
+          // 添加货物到场景中
+          TE.addObject(goodsModel);
+        }
+      );
+    });
 
     return {
       rentTitle,
@@ -180,6 +221,7 @@ export default {
       selectCarportList,
       userInfo,
       loginOut,
+      threeRef,
     };
   },
 };
@@ -326,7 +368,7 @@ function useCarport() {
       left: 0;
       width: 60%;
       height: 100%;
-      background-color: aquamarine;
+      //background-color: aquamarine;
     }
     .home-center {
       position: absolute;
@@ -386,17 +428,21 @@ function useCarport() {
   border-radius: 20px;
   padding: 10px;
   margin-bottom: 10px;
-
-  &:hover {
-    background-color: #fff7e6;
-    border: 1px solid #ffd591;
-    color: #000;
-  }
 }
-
+.hover {
+  background-color: #fff7e6;
+  border: 1px solid #ffd591;
+  color: #000;
+}
 .active {
   background-color: #d46b08;
   border: 1px solid #ffd591;
   color: #fff;
+}
+.disabled {
+  background-color: #eee;
+  border: 1px solid #999;
+  color: #000;
+  cursor: not-allowed;
 }
 </style>
