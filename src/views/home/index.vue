@@ -3,13 +3,19 @@
     <!--  用户登录信息  -->
     <div class="login-info">
       <ul>
-        <li>
-          <RouterLink to="/my">
-            <UserOutlined />{{ userInfo.username }}
-          </RouterLink>
-        </li>
-        <li>退出登录</li>
-        <li>请先登录</li>
+        <template v-if="userInfo.id">
+          <li>
+            <RouterLink to="/my" style="color: #333333">
+              <UserOutlined />{{ userInfo.username }}
+            </RouterLink>
+          </li>
+          <li @click="loginOut">退出登录</li>
+        </template>
+        <template v-else>
+          <li>
+            <RouterLink style="color: #333333" to="/login">请先登录</RouterLink>
+          </li>
+        </template>
       </ul>
     </div>
     <!--  首页内容  -->
@@ -103,6 +109,7 @@ import { getCarport, getRentlist, getSeeklist } from "@/api";
 import { UserOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { getUserInfo } from "@/utils/getUserInfo";
+import { useRouter } from "vue-router";
 import { useTEngine } from "@/hooks/useTEngine";
 import { useCarModel } from "@/hooks/useCar";
 import { Color } from "three";
@@ -112,6 +119,7 @@ export default {
   components: { CpPagination, SeekItem, RentItem, RentOrSeek, UserOutlined },
   setup() {
     const userInfo = ref(getUserInfo());
+    const router = useRouter();
     // 出租车位列表标题
     const rentTitle = ref({
       titleContent: "正在出租车位",
@@ -130,22 +138,24 @@ export default {
     const rentVisible = ref(false);
     // 关于用户车位信息列表
     const { carportList, getData } = useCarport();
+    // 退出登录
+    const loginOut = () => {
+      window.localStorage.removeItem("community-parking");
+      router.push("/login");
+    };
     // 点击我要共享按钮 显示车位信息弹框
     const rentCarport = async () => {
       await getData(userInfo.value.id);
       // 如果用户拥有车位
-      if (carportList.value.length !== 0) {
+      if (carportList.value.length !== 0 && userInfo.value !== {}) {
         // 显示弹框
         rentVisible.value = true;
-        const token = localStorage.getItem("community-parking");
-        const uid = JSON.parse(
-          Buffer.from(token.split(".")[1], "base64").toString("utf-8")
-        ).data.id;
-        // 发起请求获取我的车位信息
-        getData(uid);
-      } else {
-        // 如果用户没有车位 提示警告信息
+      } else if (carportList.value.length === 0 && userInfo.value === {}) {
+        // 如果用户已经登录并且没有车位 提示相关警告信息
         message.warning("您还没有车位！");
+      } else {
+        // 如果用户没有登录 提示相关警告信息
+        message.warning("您还没有登录或者登录失效！");
       }
     };
     // 选中的车位
@@ -209,6 +219,8 @@ export default {
       carportList,
       selectCarport,
       selectCarportList,
+      userInfo,
+      loginOut,
       threeRef,
     };
   },
@@ -304,29 +316,27 @@ function useSeekList() {
   };
 }
 // 获取用户车位数据
-const useCarport = () => {
+function useCarport() {
   // 车位列表
   const carportList = ref([]);
   // 根据用户id 获取车位信息
-  const getData = (uid) => {
-    getCarport({ uid })
-      .then((data) => {
-        console.log(data, "data");
-        // 如果返回的状态码为200
-        if (data.status === 200) {
-          carportList.value = data.data;
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const getData = async (uid) => {
+    const data = await getCarport({ uid }).catch((error) => {
+      console.log(error);
+    });
+    console.log(data, "data");
+    // 如果返回的状态码为200(不过得先判断data是否为undefined)
+    if (data?.status === 200) {
+      // 存储用户车位信息
+      carportList.value = data.data;
+    }
   };
 
   return {
     carportList,
     getData,
   };
-};
+}
 </script>
 
 <style scoped lang="less">
@@ -335,6 +345,20 @@ const useCarport = () => {
   .login-info {
     height: 50px;
     border-bottom: 1px solid #ccc;
+    ul {
+      height: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 0;
+      margin: 0;
+      li {
+        list-style: none;
+        padding: 0 20px 0 6px;
+        border-left: 2px solid #ff7300;
+        font-size: 16px;
+      }
+    }
   }
   .home-content {
     height: calc(100% - 50px);
