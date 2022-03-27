@@ -42,8 +42,8 @@ instanceWithToken.interceptors.response.use(
         .catch(() => {
           console.log("跳转失败");
         });
-      // 清空失效的token(用户已登录 但token失效)
-      window.localStorage.setItem("community-parking", "");
+      // 移除失效的token(用户已登录 但token失效)
+      window.localStorage.removeItem("community-parking");
     }
     return Promise.reject(error);
   }

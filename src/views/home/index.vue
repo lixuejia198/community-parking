@@ -3,13 +3,19 @@
     <!--  用户登录信息  -->
     <div class="login-info">
       <ul>
-        <li>
-          <RouterLink to="/my">
-            <UserOutlined />{{ userInfo.username }}
-          </RouterLink>
-        </li>
-        <li>退出登录</li>
-        <li>请先登录</li>
+        <template v-if="userInfo.id">
+          <li>
+            <RouterLink to="/my" style="color: #333333">
+              <UserOutlined />{{ userInfo.username }}
+            </RouterLink>
+          </li>
+          <li @click="loginOut">退出登录</li>
+        </template>
+        <template v-else>
+          <li>
+            <RouterLink style="color: #333333" to="/login">请先登录</RouterLink>
+          </li>
+        </template>
       </ul>
     </div>
     <!--  首页内容  -->
@@ -100,11 +106,13 @@ import { getCarport, getRentlist, getSeeklist } from "@/api/index";
 import { UserOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { getUserInfo } from "@/utils/getUserInfo";
+import { useRouter } from "vue-router";
 export default {
   name: "Home",
   components: { CpPagination, SeekItem, RentItem, RentOrSeek, UserOutlined },
   setup() {
     const userInfo = ref(getUserInfo());
+    const router = useRouter();
     // 出租车位列表标题
     const rentTitle = ref({
       titleContent: "正在出租车位",
@@ -123,16 +131,24 @@ export default {
     const rentVisible = ref(false);
     // 关于用户车位信息列表
     const { carportList, getData } = useCarport();
+    // 退出登录
+    const loginOut = () => {
+      window.localStorage.removeItem("community-parking");
+      router.push("/login");
+    };
     // 点击我要共享按钮 显示车位信息弹框
     const rentCarport = async () => {
       await getData(userInfo.value.id);
       // 如果用户拥有车位
-      if (carportList.value.length !== 0) {
+      if (carportList.value.length !== 0 && userInfo.value !== {}) {
         // 显示弹框
         rentVisible.value = true;
-      } else {
-        // 如果用户没有车位 提示警告信息
+      } else if (carportList.value.length === 0 && userInfo.value === {}) {
+        // 如果用户已经登录并且没有车位 提示相关警告信息
         message.warning("您还没有车位！");
+      } else {
+        // 如果用户没有登录 提示相关警告信息
+        message.warning("您还没有登录或者登录失效！");
       }
     };
     // 选中的车位
@@ -163,6 +179,7 @@ export default {
       selectCarport,
       selectCarportList,
       userInfo,
+      loginOut,
     };
   },
 };
@@ -265,9 +282,9 @@ function useCarport() {
     const data = await getCarport({ uid }).catch((error) => {
       console.log(error);
     });
-    // console.log(data, "data");
-    // 如果返回的状态码为200
-    if (data.status === 200) {
+    console.log(data, "data");
+    // 如果返回的状态码为200(不过得先判断data是否为undefined)
+    if (data?.status === 200) {
       // 存储用户车位信息
       carportList.value = data.data;
     }
