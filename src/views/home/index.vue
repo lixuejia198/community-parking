@@ -196,7 +196,7 @@ export default {
 
       const car = { name: "car-red" };
       // 渲染货物模型
-      useCarModel({ car, groupScale: 8, color: new Color(0xff7300) }).then(
+      useCarModel({ car, groupScale: 80, color: new Color(0xff7300) }).then(
         (goodsModel) => {
           // 添加货物到场景中
           TE.addObject(goodsModel);

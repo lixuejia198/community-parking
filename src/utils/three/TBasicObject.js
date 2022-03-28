@@ -5,7 +5,7 @@ export const basicObjectList = [];
 // 地面
 const stage = new Mesh(
   // 几何对象
-  new BoxBufferGeometry(600, 10, 600),
+  new BoxBufferGeometry(6000, 10, 6000),
   // 网格标准材质
   new MeshStandardMaterial({ color: 0xffffff, metalness: 1 })
 );
