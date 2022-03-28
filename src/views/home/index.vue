@@ -92,9 +92,12 @@
       @click="selectCarportList(carport)"
     >
       <p>ID：{{ carport.id }}</p>
-      <p>车位编码：{{ carport.pname }}</p>
+
       <p>所在花园：{{ carport.comname }}</p>
       <p>地址：{{ carport.place }}</p>
+      <div class="model-com-name">
+        {{ carport.pname }}
+      </div>
     </div>
   </a-modal>
 </template>
@@ -150,7 +153,7 @@ export default {
       if (carportList.value.length !== 0 && userInfo.value !== {}) {
         // 显示弹框
         rentVisible.value = true;
-      } else if (carportList.value.length === 0 && userInfo.value === {}) {
+      } else if (carportList.value.length === 0 && userInfo.value !== {}) {
         // 如果用户已经登录并且没有车位 提示相关警告信息
         message.warning("您还没有车位！");
       } else {
@@ -162,10 +165,11 @@ export default {
     const selectCarport = ref({});
     // 选中车位
     const selectCarportList = (carport) => {
-      if (selectCarport.value.id > 0) {
-        // 如果当前是否选中车位 如果选中则取消选中
+      // 如果当前选中的车位和上次选中的车位一样
+      if (carport.id === selectCarport.value.id) {
+        // 就取消选中
         selectCarport.value = {};
-      } else if (carport.id !== 0 && carport.state === 0) {
+      } else if (carport.id !== selectCarport.value.id && carport.state === 0) {
         // 如果当前车位未被选中并且车位不处于禁用状态则选中
         selectCarport.value = carport;
       }
@@ -195,7 +199,7 @@ export default {
       };
 
       const car = { name: "car-red" };
-      // 渲染货物模型
+      // 渲染汽车模型
       useCarModel({ car, groupScale: 80, color: new Color(0xff7300) }).then(
         (goodsModel) => {
           // 添加货物到场景中
@@ -428,6 +432,20 @@ function useCarport() {
   border-radius: 20px;
   padding: 10px;
   margin-bottom: 10px;
+  position: relative;
+  .model-com-name {
+    position: absolute;
+    top: 0;
+    right: 10px;
+    font-size: 60px;
+    color: #ff7300;
+    opacity: 0.4;
+    // 设置文字无法选中
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
 }
 .hover {
   background-color: #fff7e6;
@@ -435,9 +453,12 @@ function useCarport() {
   color: #000;
 }
 .active {
-  background-color: #d46b08;
+  background-color: #ff7300;
   border: 1px solid #ffd591;
   color: #fff;
+  .model-com-name {
+    color: #fff;
+  }
 }
 .disabled {
   background-color: #eee;
