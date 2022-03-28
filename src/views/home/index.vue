@@ -105,7 +105,8 @@ import { onMounted, ref, watch } from "vue";
 import RentItem from "@/views/home/components/rentItem";
 import SeekItem from "@/views/home/components/seekItem";
 import CpPagination from "@/components/CpPagination";
-import { getCarport, getRentlist, getSeeklist } from "@/api";
+import { getRentlist, getSeeklist } from "@/api";
+import { getCarport } from "@/api/carport";
 import { UserOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { getUserInfo } from "@/utils/getUserInfo";
@@ -113,6 +114,7 @@ import { useRouter } from "vue-router";
 import { useTEngine } from "@/hooks/useTEngine";
 import { useCarModel } from "@/hooks/useCar";
 import { Color } from "three";
+import { useCarportModel } from "@/hooks/useCarport";
 
 export default {
   name: "Home",
@@ -134,10 +136,13 @@ export default {
     const { rentList, rentListCount, rentParams } = useRentList();
     // 关于寻找车位列表
     const { seekList, seekListCount, seekParams } = useSeekList();
+    // 关于车位列表
+    const { carportList, getData } = useCarportList();
     // 控制弹框的显示与隐藏
     const rentVisible = ref(false);
     // 关于用户车位信息列表
-    const { carportList, getData } = useCarport();
+    const { carportList: userCarportList, getData: getUserData } =
+      useCarportList();
     // 退出登录
     const loginOut = () => {
       window.localStorage.removeItem("community-parking");
@@ -145,12 +150,12 @@ export default {
     };
     // 点击我要共享按钮 显示车位信息弹框
     const rentCarport = async () => {
-      await getData(userInfo.value.id);
+      await getUserData({ uid: userInfo.value.id });
       // 如果用户拥有车位
-      if (carportList.value.length !== 0 && userInfo.value !== {}) {
+      if (userCarportList.value.length !== 0 && userInfo.value !== {}) {
         // 显示弹框
         rentVisible.value = true;
-      } else if (carportList.value.length === 0 && userInfo.value === {}) {
+      } else if (userCarportList.value.length === 0 && userInfo.value === {}) {
         // 如果用户已经登录并且没有车位 提示相关警告信息
         message.warning("您还没有车位！");
       } else {
@@ -195,13 +200,22 @@ export default {
       };
 
       const car = { name: "car-red" };
-      // 渲染货物模型
+      // 渲染汽车模型
       useCarModel({ car, groupScale: 80, color: new Color(0xff7300) }).then(
         (goodsModel) => {
           // 添加货物到场景中
           TE.addObject(goodsModel);
         }
       );
+      // 获取车位数据
+      getData({ comid: 1 }).then((result) => {
+        result.forEach((item) => {
+          // 渲染车位模型
+          const carportGroup = useCarportModel();
+          carportGroup.position.set(item.x * 200, item.y * 200, item.z * 490);
+          TE.addObject(carportGroup);
+        });
+      });
     });
 
     return {
@@ -217,6 +231,7 @@ export default {
       rentVisible,
       handleOkRent,
       carportList,
+      userCarportList,
       selectCarport,
       selectCarportList,
       userInfo,
@@ -315,13 +330,13 @@ function useSeekList() {
     seekParams,
   };
 }
-// 获取用户车位数据
-function useCarport() {
+// 获取车位数据
+function useCarportList() {
   // 车位列表
   const carportList = ref([]);
   // 根据用户id 获取车位信息
-  const getData = async (uid) => {
-    const data = await getCarport({ uid }).catch((error) => {
+  const getData = async ({ uid, comid }) => {
+    const data = await getCarport({ uid, comid }).catch((error) => {
       console.log(error);
     });
     console.log(data, "data");
@@ -329,7 +344,9 @@ function useCarport() {
     if (data?.status === 200) {
       // 存储用户车位信息
       carportList.value = data.data;
+      return data.data;
     }
+    return [];
   };
 
   return {
