@@ -28,3 +28,12 @@ export function getSeeklist({ page = 1, limit = 6 }) {
 export function getCarport({ uid }) {
   return requestWithToken("/carport", "get", { uid });
 }
+
+/***
+ * 查询车信息
+ * @param uid 用户id
+ * @returns {Promise}
+ */
+export function getCarInfo({ uid }) {
+  return requestWithToken("/car", "get", { uid });
+}

@@ -51,7 +51,9 @@
       <div class="home-right">
         <rent-or-seek :title="seekTitle">
           <template v-slot:button>
-            <span class="seeklist-button">{{ seekTitle.titleButton }}</span>
+            <span class="seeklist-button" @click="seekCarport">
+              {{ seekTitle.titleButton }}
+            </span>
           </template>
           <template v-slot:item>
             <seek-item
@@ -72,6 +74,7 @@
       </div>
     </div>
   </div>
+  <!-- 出租车位弹框 -->
   <a-modal
     v-model:visible="rentVisible"
     title="请选择你要共享的车位"
@@ -92,11 +95,37 @@
       @click="selectCarportList(carport)"
     >
       <p>ID：{{ carport.id }}</p>
-
       <p>所在花园：{{ carport.comname }}</p>
       <p>地址：{{ carport.place }}</p>
       <div class="model-com-name">
         {{ carport.pname }}
+      </div>
+    </div>
+  </a-modal>
+  <!-- 寻找车位弹框 -->
+  <a-modal
+    v-model:visible="seekVisible"
+    title="请选择你所需要车位的车"
+    cancelText="取消"
+    okText="确定"
+    @ok="handleOkSeek"
+  >
+    <div
+      v-for="carInfo in carInfoList"
+      :key="carInfo.id"
+      class="modal-com-item"
+      :class="{
+        active: selectCarInfo.id === carInfo.id && carInfo.pid === null,
+        disabled: carInfo.pid !== null,
+      }"
+      @mouseenter="(e) => e.target.classList.add('hover')"
+      @mouseleave="(e) => e.target.classList.remove('hover')"
+      @click="selectCarInfoList(carInfo)"
+    >
+      <p>ID：{{ carInfo.id }}</p>
+      <p>车牌号：{{ carInfo.cname }}</p>
+      <div class="model-com-name">
+        {{ carInfo.cname }}
       </div>
     </div>
   </a-modal>
@@ -108,7 +137,7 @@ import { onMounted, ref, watch } from "vue";
 import RentItem from "@/views/home/components/rentItem";
 import SeekItem from "@/views/home/components/seekItem";
 import CpPagination from "@/components/CpPagination";
-import { getCarport, getRentlist, getSeeklist } from "@/api";
+import { getCarport, getRentlist, getSeeklist, getCarInfo } from "@/api";
 import { UserOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { getUserInfo } from "@/utils/getUserInfo";
@@ -137,29 +166,37 @@ export default {
     const { rentList, rentListCount, rentParams } = useRentList();
     // 关于寻找车位列表
     const { seekList, seekListCount, seekParams } = useSeekList();
-    // 控制弹框的显示与隐藏
-    const rentVisible = ref(false);
-    // 关于用户车位信息列表
-    const { carportList, getData } = useCarport();
     // 退出登录
     const loginOut = () => {
       window.localStorage.removeItem("community-parking");
       router.push("/login");
     };
+    // 控制弹框的显示与隐藏
+    const rentVisible = ref(false);
+    const seekVisible = ref(false);
+    // 关于用户车位信息列表
+    const { carportList, getData } = useCarport();
     // 点击我要共享按钮 显示车位信息弹框
     const rentCarport = async () => {
       await getData(userInfo.value.id);
       // 如果用户拥有车位
-      if (carportList.value.length !== 0 && userInfo.value !== {}) {
+      if (carportList.value.length !== 0 && userInfo.value.id) {
         // 显示弹框
         rentVisible.value = true;
-      } else if (carportList.value.length === 0 && userInfo.value !== {}) {
+      } else if (carportList.value.length === 0 && userInfo.value.id) {
         // 如果用户已经登录并且没有车位 提示相关警告信息
         message.warning("您还没有车位！");
       } else {
         // 如果用户没有登录 提示相关警告信息
         message.warning("您还没有登录或者登录失效！");
       }
+    };
+    // 关于用户车的信息列表
+    const { carInfoList, getCarData } = useCarInfo();
+    // 点击我要使用按钮 显示车的信息弹框
+    const seekCarport = async () => {
+      await getCarData(userInfo.value.id);
+      seekVisible.value = true;
     };
     // 选中的车位
     const selectCarport = ref({});
@@ -174,11 +211,30 @@ export default {
         selectCarport.value = carport;
       }
     };
-    // 点击弹框的确定按钮的回调事件
+    // 选中的车
+    const selectCarInfo = ref({});
+    // 选中需要车位的车
+    const selectCarInfoList = (carInfo) => {
+      // 如果当前选中的车和上次选中的车一样
+      if (carInfo.id === selectCarInfo.value.id) {
+        // 就取消选中
+        selectCarInfo.value = {};
+      } else if (
+        // 如果当前车未被选中并且不处于禁用状态则选中
+        carInfo.id !== selectCarInfo.value.id &&
+        carInfo.pid === null
+      ) {
+        selectCarInfo.value = carInfo;
+      }
+    };
+    // 点击出租车位共享弹框的确定按钮的回调事件
     const handleOkRent = (e) => {
       console.log(e);
     };
-
+    // 点击寻找车位共享弹框的确定按钮的回调事件
+    const handleOkSeek = (e) => {
+      console.log(e);
+    };
     // three 绑定的元素
     const threeRef = ref(null);
     // 实例化的 ThreeJS 引擎
@@ -226,6 +282,12 @@ export default {
       userInfo,
       loginOut,
       threeRef,
+      seekVisible,
+      handleOkSeek,
+      seekCarport,
+      carInfoList,
+      selectCarInfo,
+      selectCarInfoList,
     };
   },
 };
@@ -339,6 +401,28 @@ function useCarport() {
   return {
     carportList,
     getData,
+  };
+}
+// 获取用户车的信息
+function useCarInfo() {
+  // 车信息列表
+  const carInfoList = ref([]);
+  // 根据用户id 获取车信息
+  const getCarData = async (uid) => {
+    const data = await getCarInfo({ uid }).catch((error) => {
+      console.log(error);
+    });
+    console.log(data, "data");
+    // 如果返回的状态码为200(不过得先判断data是否为undefined)
+    if (data?.status === 200) {
+      // 存储用户车的信息
+      carInfoList.value = data.data;
+    }
+  };
+
+  return {
+    carInfoList,
+    getCarData,
   };
 }
 </script>
