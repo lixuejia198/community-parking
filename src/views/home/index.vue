@@ -92,7 +92,6 @@
       @click="selectCarportList(carport)"
     >
       <p>ID：{{ carport.id }}</p>
-
       <p>所在花园：{{ carport.comname }}</p>
       <p>地址：{{ carport.place }}</p>
       <div class="model-com-name">
@@ -216,7 +215,17 @@ export default {
         result.forEach((item) => {
           // 渲染车位模型
           const carportGroup = useCarportModel();
-          carportGroup.position.set(item.x * 200, item.y * 200, item.z * 490);
+          // 设置车位位置
+          carportGroup.position.set(item.x, item.y, item.z);
+          if (item.direction) {
+            // 设置车位方向
+            carportGroup.rotateY(Math.PI / item.direction);
+            // 设置车位位置
+            // carportGroup.position.set(item.x * 500, item.y * 200, item.z * 200);
+          } else {
+            // 设置车位位置
+            // carportGroup.position.set(item.x * 200, item.y * 200, item.z * 500);
+          }
           TE.addObject(carportGroup);
         });
       });

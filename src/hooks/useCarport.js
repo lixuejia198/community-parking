@@ -7,7 +7,7 @@ export const useCarportModel = () => {
   // 长边
   const lengthMesh = new Mesh(
     // 几何对象
-    new BoxBufferGeometry(10, 2, 500),
+    new BoxBufferGeometry(10, 2, 510),
     // 网格标准材质
     new MeshStandardMaterial({ color: 0xffc700, metalness: 1 })
   );
@@ -32,12 +32,12 @@ export const useCarportModel = () => {
 
   // 前面
   const leftShortMesh = shortMesh.clone();
-  leftShortMesh.position.set(0, 0, 245);
+  leftShortMesh.position.set(0, 0, 250);
   carportGroup.add(leftShortMesh);
 
   // 后面
   const rightShortMesh = shortMesh.clone();
-  rightShortMesh.position.set(0, 0, -245);
+  rightShortMesh.position.set(0, 0, -250);
   carportGroup.add(rightShortMesh);
 
   return carportGroup;
