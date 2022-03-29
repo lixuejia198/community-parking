@@ -6,12 +6,12 @@ export const lightsList = [];
 // 环境光(颜色,强度,范围,衰减)
 const ambientLight = new AmbientLight(0xffffff, 1.2);
 // 点光源
-export const pointLight = new PointLight(0xffffff, 1, 10000, 0.1);
+export const pointLight = new PointLight(0xffffff, 0.6, 8000, 0.1);
 // 设置点光源位置
-pointLight.position.set(2000, 3000, -1000);
+pointLight.position.set(3000, 3000, -1000);
 
 // 点光源
-export const pointLight2 = new PointLight(0xffffff, 1, 8000, 0.1);
+export const pointLight2 = new PointLight(0xffffff, 0.6, 8000, 0.1);
 // 设置点光源位置
 pointLight2.position.set(0, 2000, -3000);
 
