@@ -65,7 +65,6 @@ export const useCarportModel = (name) => {
       bevelSize: 1, // 斜角的大小
       // bevelSegments: 1, // 斜角段数
     });
-    console.log("geometry", geometry, geometry.parameters);
     const mat = new MeshPhongMaterial({
       color: "white",
       opacity: 0.8,

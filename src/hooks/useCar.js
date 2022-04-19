@@ -1,10 +1,8 @@
 import { CarMobile } from "@/utils/three/loadModel/carModelLocation";
 
 const useCarModel = async ({ car, groupScale = 10, color }) => {
-  console.log("useCarModel", color);
   // 加载模型
   const group = await CarMobile;
-  console.log(group, group.scene.children[0]);
   // 复制模型
   const newGroup = group.scene.children[0].clone();
   // 克隆材质

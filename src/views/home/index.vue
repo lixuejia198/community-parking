@@ -301,7 +301,6 @@ export default {
             // 设置车辆方向
             carGroup.rotateY(Math.PI / item.direction);
           }
-          console.log("carGroup", carGroup);
           // 添加货物到场景中
           TE.addObject(carGroup);
         });
