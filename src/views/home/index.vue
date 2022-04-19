@@ -266,7 +266,7 @@ export default {
       getData({ comid: 1 }).then((result) => {
         result.forEach((item) => {
           // 渲染车位模型
-          const carportGroup = useCarportModel();
+          const carportGroup = useCarportModel(item.pname);
           // 设置车位位置
           carportGroup.position.set(item.x, item.y, item.z);
           if (item.direction) {
