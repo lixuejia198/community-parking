@@ -4,7 +4,7 @@ import { AmbientLight, PointLight, SpotLight } from "three";
 export const lightsList = [];
 
 // 环境光(颜色,强度,范围,衰减)
-const ambientLight = new AmbientLight(0xffffff, 1.2);
+const ambientLight = new AmbientLight(0xffffff, 0.6);
 // 点光源
 export const pointLight = new PointLight(0xffffff, 0.6, 8000, 0.1);
 // 设置点光源位置

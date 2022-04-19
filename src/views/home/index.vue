@@ -111,7 +111,7 @@
     @ok="handleOkSeek"
   >
     <div
-      v-for="carInfo in carInfoList"
+      v-for="carInfo in userCarList"
       :key="carInfo.id"
       class="modal-com-item"
       :class="{
@@ -120,7 +120,7 @@
       }"
       @mouseenter="(e) => e.target.classList.add('hover')"
       @mouseleave="(e) => e.target.classList.remove('hover')"
-      @click="selectCarInfoList(carInfo)"
+      @click="selectUserCarList(carInfo)"
     >
       <p>ID：{{ carInfo.id }}</p>
       <p>车牌号：{{ carInfo.cname }}</p>
@@ -137,8 +137,9 @@ import { onMounted, ref, watch } from "vue";
 import RentItem from "@/views/home/components/rentItem";
 import SeekItem from "@/views/home/components/seekItem";
 import CpPagination from "@/components/CpPagination";
-import { getCarInfo, getRentlist, getSeeklist } from "@/api";
+import { getRentlist, getSeeklist } from "@/api";
 import { getCarport } from "@/api/carport";
+import { getCar } from "@/api/car";
 import { UserOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { getUserInfo } from "@/utils/getUserInfo";
@@ -170,6 +171,8 @@ export default {
     const { seekList, seekListCount, seekParams } = useSeekList();
     // 关于车位列表
     const { carportList, getData } = useCarportList();
+    // 关于车辆列表
+    const { getCarData } = useCarList();
     // 退出登录
     const loginOut = () => {
       window.localStorage.removeItem("community-parking");
@@ -196,11 +199,11 @@ export default {
         message.warning("您还没有登录或者登录失效！");
       }
     };
-    // 关于用户车的信息列表
-    const { carInfoList, getCarData } = useCarInfo();
-    // 点击我要使用按钮 显示车的信息弹框
+    // 关于用户车辆列表
+    const { carList: userCarList, getCarData: getUserCarData } = useCarList();
+    // 点击我要使用按钮 显示车辆弹框
     const seekCarport = async () => {
-      await getCarData(userInfo.value.id);
+      await getUserCarData(userInfo.value.id);
       seekVisible.value = true;
     };
     // 选中的车位
@@ -219,7 +222,7 @@ export default {
     // 选中的车
     const selectCarInfo = ref({});
     // 选中需要车位的车
-    const selectCarInfoList = (carInfo) => {
+    const selectUserCarList = (carInfo) => {
       // 如果当前选中的车和上次选中的车一样
       if (carInfo.id === selectCarInfo.value.id) {
         // 就取消选中
@@ -259,14 +262,6 @@ export default {
         })();
       };
 
-      const car = { name: "car-red" };
-      // 渲染汽车模型
-      useCarModel({ car, groupScale: 80, color: new Color(0xff7300) }).then(
-        (goodsModel) => {
-          // 添加货物到场景中
-          TE.addObject(goodsModel);
-        }
-      );
       // 获取车位数据
       getData({ comid: 1 }).then((result) => {
         result.forEach((item) => {
@@ -284,6 +279,31 @@ export default {
             // carportGroup.position.set(item.x * 200, item.y * 200, item.z * 500);
           }
           TE.addObject(carportGroup);
+        });
+      });
+      // 获取车辆信息
+      getCarData({ comid: 1 }).then((result) => {
+        result.forEach(async (item) => {
+          // 渲染汽车模型
+          const carGroup = await useCarModel({
+            car: { name: "car-red" },
+            groupScale: 80,
+            color: new Color(
+              `#${((Math.random() * 0x1000000) << 0).toString(16)}00000`.slice(
+                0,
+                7
+              )
+            ),
+          });
+          // 设置车辆位置
+          carGroup.position.set(item.x, item.y, item.z);
+          if (item.direction) {
+            // 设置车辆方向
+            carGroup.rotateY(Math.PI / item.direction);
+          }
+          console.log("carGroup", carGroup);
+          // 添加货物到场景中
+          TE.addObject(carGroup);
         });
       });
     });
@@ -310,9 +330,9 @@ export default {
       seekVisible,
       handleOkSeek,
       seekCarport,
-      carInfoList,
+      userCarList,
       selectCarInfo,
-      selectCarInfoList,
+      selectUserCarList,
     };
   },
 };
@@ -430,25 +450,27 @@ function useCarportList() {
     getData,
   };
 }
-// 获取用户车的信息
-function useCarInfo() {
+// 获取车辆数据
+function useCarList() {
   // 车信息列表
-  const carInfoList = ref([]);
+  const carList = ref([]);
   // 根据用户id 获取车信息
-  const getCarData = async (uid) => {
-    const data = await getCarInfo({ uid }).catch((error) => {
+  const getCarData = async ({ uid, comid }) => {
+    const data = await getCar({ uid, comid }).catch((error) => {
       console.log(error);
     });
     console.log(data, "data");
     // 如果返回的状态码为200(不过得先判断data是否为undefined)
     if (data?.status === 200) {
-      // 存储用户车的信息
-      carInfoList.value = data.data;
+      // 存储用户车辆
+      carList.value = data.data;
+      return data.data;
     }
+    return data.data;
   };
 
   return {
-    carInfoList,
+    carList,
     getCarData,
   };
 }
