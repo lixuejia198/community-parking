@@ -20,6 +20,8 @@ export class TEngine {
       // 抗锯齿
       antialias: true,
     });
+    // 设置像素密度
+    this.renderer.setPixelRatio(window.devicePixelRatio);
     // 是否渲染阴影
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = PCFSoftShadowMap; // default THREE.PCFShadowMap
