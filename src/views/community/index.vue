@@ -10,17 +10,16 @@
       <div class="community-center">
         <rent-or-seek :title="rentTitle">
           <template v-slot:button>
-            <span class="rentlist-button" @click="rentCarport">
+            <span class="rentlist-title-button" @click="rentCarport">
               {{ rentTitle.titleButton }}
             </span>
           </template>
           <template v-slot:item>
-            <rent-item
-              list-button="我想使用"
-              v-for="rent in rentList"
-              :key="rent.id"
-              :rent="rent"
-            />
+            <rent-item v-for="rent in rentList" :key="rent.id" :rent="rent">
+              <template v-slot:itemButton>
+                <span class="rentlist-item-button">我想使用</span>
+              </template>
+            </rent-item>
           </template>
           <template v-slot:pagination>
             <CpPagination
@@ -35,17 +34,16 @@
       <div class="community-right">
         <rent-or-seek :title="seekTitle">
           <template v-slot:button>
-            <span class="seeklist-button" @click="seekCarport">
+            <span class="seeklist-title-button" @click="seekCarport">
               {{ seekTitle.titleButton }}
             </span>
           </template>
           <template v-slot:item>
-            <seek-item
-              list-button="我要共享"
-              v-for="seek in seekList"
-              :key="seek.id"
-              :seek="seek"
-            />
+            <seek-item v-for="seek in seekList" :key="seek.id" :seek="seek">
+              <template v-slot:itemButton>
+                <span class="seeklist-item-button">我要共享</span>
+              </template>
+            </seek-item>
           </template>
           <template v-slot:pagination>
             <CpPagination
@@ -187,7 +185,7 @@ export default {
     const { carList: userCarList, getCarData: getUserCarData } = useCarList();
     // 点击我要使用按钮 显示车辆弹框
     const seekCarport = async () => {
-      await getUserCarData(userInfo.value.id);
+      await getUserCarData({ uid: userInfo.value.id });
       seekVisible.value = true;
     };
     // 选中的车位
@@ -391,7 +389,7 @@ function useCarList() {
         width: 100%;
         height: 100%;
       }
-      .rentlist-button {
+      .rentlist-title-button {
         color: #d46b08;
         background: #fff7e6;
         border: 1px solid #ffd591;
@@ -399,6 +397,13 @@ function useCarList() {
         height: 40px;
         text-align: center;
         line-height: 40px;
+        cursor: pointer;
+      }
+      .rentlist-item-button {
+        font-size: 14px;
+        padding: 8px;
+        background-color: rgba(255, 115, 0, 1);
+        color: white;
         cursor: pointer;
       }
     }
@@ -415,7 +420,7 @@ function useCarList() {
         width: 100%;
         height: 100%;
       }
-      .seeklist-button {
+      .seeklist-title-button {
         color: #d46b08;
         background: #fff7e6;
         border: 1px solid #ffd591;
@@ -423,6 +428,13 @@ function useCarList() {
         height: 40px;
         text-align: center;
         line-height: 40px;
+        cursor: pointer;
+      }
+      .seeklist-item-button {
+        font-size: 14px;
+        padding: 8px;
+        background-color: rgba(255, 115, 0, 1);
+        color: white;
         cursor: pointer;
       }
     }

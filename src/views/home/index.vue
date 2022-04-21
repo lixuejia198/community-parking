@@ -11,7 +11,17 @@
         <div class="home-community"></div>
       </div>
       <!--  出租车位和寻找车位列表展示(具体功能在小区模块实现)  -->
-      <div class="home-show"></div>
+      <div class="home-show">
+        <rent-or-seek
+          :title="{
+            titleContent: '正在出租车位',
+          }"
+        >
+          <template v-slot:item>
+            <rent-item v-for="rent in rentList" :key="rent.id" :rent="rent" />
+          </template>
+        </rent-or-seek>
+      </div>
     </div>
   </div>
 </template>
@@ -19,9 +29,12 @@
 <script>
 import TopNav from "@/components/TopNav";
 import Carousel from "@/components/Carousel";
+import RentOrSeek from "@/views/community/components/rentOrSeek";
+import RentItem from "@/views/community/components/rentItem";
+import { useRentList } from "@/hooks/useRentList";
 
 export default {
-  components: { Carousel, TopNav },
+  components: { RentItem, RentOrSeek, Carousel, TopNav },
   setup() {
     // 轮播图数据
     const banners = [
@@ -29,9 +42,11 @@ export default {
       { id: 2, imgUrl: "/images/carousel_02.webp" },
       { id: 3, imgUrl: "/images/carousel_03.webp" },
     ];
+    const { rentList } = useRentList();
 
     return {
       banners,
+      rentList,
     };
   },
 };

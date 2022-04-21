@@ -2,7 +2,7 @@
   <div class="rentOrSeek-list-content-item">
     <div class="rentOrSeek-list-content-number">
       <h3>{{ rent.pname }}</h3>
-      <span @click="showModel">{{ listButton }}</span>
+      <slot name="itemButton" />
     </div>
     <a-row class="rentOrSeek-list-content-state">
       <a-col :span="3"><span>状态</span></a-col>
@@ -26,48 +26,17 @@
       </a-col>
     </a-row>
   </div>
-  <a-modal
-    v-model:visible="visible"
-    title="温馨提示"
-    cancelText="取消"
-    okText="确定"
-    @ok="handleOk"
-  >
-    <p>您确定要使用这个车位吗？</p>
-  </a-modal>
 </template>
 
 <script>
-import { ref } from "vue";
-
 export default {
   name: "rentItem",
   props: {
-    listButton: {
-      type: String,
-    },
     rent: {
       type: Object,
     },
   },
-  setup() {
-    // 控制弹框的显示与隐藏
-    const visible = ref(false);
-    // 显示弹框
-    const showModel = () => {
-      visible.value = true;
-    };
-    // 点击弹框的确定按钮的回调事件
-    const handleOk = (e) => {
-      console.log(e);
-    };
-
-    return {
-      visible,
-      showModel,
-      handleOk,
-    };
-  },
+  setup() {},
 };
 </script>
 
@@ -90,13 +59,6 @@ export default {
       font-weight: bold;
       font-size: 18px;
       line-height: 40px;
-    }
-    span {
-      font-size: 14px;
-      padding: 8px;
-      background-color: rgba(255, 115, 0, 1);
-      color: white;
-      cursor: pointer;
     }
   }
   .rentOrSeek-list-content-state,
