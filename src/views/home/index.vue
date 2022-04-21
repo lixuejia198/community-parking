@@ -252,15 +252,14 @@ export default {
       TE = useTEngine(threeRef.value);
 
       // 自动调整渲染器大小
-      window.onresize = () => {
-        return (() => {
+      window.onresize = () =>
+        (() => {
           // 设置正投影相机大小
           TE.setOrthographicCameraSize(
-            document.body.clientWidth,
-            document.body.clientHeight
+            threeRef.value.clientWidth,
+            threeRef.value.clientHeight
           );
         })();
-      };
 
       // 获取车位数据
       getData({ comid: 1 }).then((result) => {
