@@ -48,6 +48,16 @@ export const useCarportModel = (name) => {
   rightShortMesh.position.set(0, 0, -250);
   carportGroup.add(rightShortMesh);
 
+  // 车位地面
+  const groundMesh = new Mesh(
+    // 几何对象
+    new BoxBufferGeometry(200, 1, 510),
+    // 网格标准材质
+    new MeshStandardMaterial({ color: 0x88ff88, metalness: 1 })
+  );
+  groundMesh.position.set(0, -0.2, 0);
+  carportGroup.add(groundMesh);
+
   // 添加文字geometry
   async function createTextGeometry(text, size) {
     const loader = new FontLoader();
