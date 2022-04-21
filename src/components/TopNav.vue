@@ -53,10 +53,7 @@ export default {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    padding: 0;
-    margin: 0;
     li {
-      list-style: none;
       padding: 0 20px 0 6px;
       border-left: 2px solid #ff7300;
       font-size: 16px;

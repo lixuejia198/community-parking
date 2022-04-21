@@ -117,11 +117,10 @@
 
 <script>
 import RentOrSeek from "@/views/community/components/rentOrSeek";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import RentItem from "@/views/community/components/rentItem";
 import SeekItem from "@/views/community/components/seekItem";
 import CpPagination from "@/components/CpPagination";
-import { getRentlist, getSeeklist } from "@/api";
 import { getCarport } from "@/api/carport";
 import { getCar } from "@/api/car";
 import { message } from "ant-design-vue";
@@ -130,6 +129,8 @@ import { useTEngine } from "@/hooks/useTEngine";
 import { useCarModel } from "@/hooks/useCar";
 import { Color } from "three";
 import { useCarportModel } from "@/hooks/useCarport";
+import { useRentList } from "@/hooks/useRentList";
+import { useSeekList } from "@/hooks/useSeekList";
 import TopNav from "@/components/TopNav";
 
 export default {
@@ -316,96 +317,6 @@ export default {
     };
   },
 };
-// 获取出租车位列表数据
-function useRentList() {
-  // 出租车位列表
-  const rentList = ref(null);
-  // 出租车位列表总数量
-  const rentListCount = ref(0);
-  // 出租车位列表分页参数
-  const rentParams = ref({
-    // 当前页
-    page: 1,
-    // 每页显示多少条数据
-    pageSize: 5,
-  });
-  // 获取出租车位列表数据
-  const getData = () => {
-    getRentlist({
-      page: rentParams.value.page,
-      limit: rentParams.value.pageSize,
-    }).then((data) => {
-      // console.log(data, "data");
-      if (data.status === 200) {
-        // 存储出租车位列表数据
-        rentList.value = data.data;
-        // 存储总数量
-        rentListCount.value = data.total;
-      }
-    });
-  };
-  // 监听请求参数的变化
-  watch(
-    rentParams.value,
-    () => {
-      getData();
-    },
-    // 初始调用 默认不会初始调用 设为true便会初始调用一次
-    {
-      immediate: true,
-    }
-  );
-  return {
-    rentListCount,
-    rentList,
-    rentParams,
-  };
-}
-// 获取寻找车位列表数据
-function useSeekList() {
-  // 寻找车位列表
-  const seekList = ref(null);
-  // 寻找车位列表总数量
-  const seekListCount = ref(0);
-  // 寻找车位列表分页参数
-  const seekParams = ref({
-    // 当前页
-    page: 1,
-    // 每页显示多少条数据
-    pageSize: 5,
-  });
-  // 获取寻找车位列表数据
-  const getData = () => {
-    getSeeklist({
-      page: seekParams.value.page,
-      limit: seekParams.value.pageSize,
-    }).then((data) => {
-      // console.log(data, "data");
-      if (data.status === 200) {
-        // 存储寻找车位列表数据
-        seekList.value = data.data;
-        // 存储总数量
-        seekListCount.value = data.total;
-      }
-    });
-  };
-  // 监听请求参数的变化
-  watch(
-    seekParams.value,
-    () => {
-      getData();
-    },
-    // 初始调用 默认不会初始调用 设为true便会初始调用一次
-    {
-      immediate: true,
-    }
-  );
-  return {
-    seekList,
-    seekListCount,
-    seekParams,
-  };
-}
 // 获取车位数据
 function useCarportList() {
   // 车位列表
