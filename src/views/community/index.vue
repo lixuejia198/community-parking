@@ -65,7 +65,7 @@
     @ok="handleOkRent"
   >
     <div
-      v-for="carport in carportList"
+      v-for="carport in userCarportList"
       :key="carport.id"
       class="modal-com-item"
       :class="{
@@ -142,33 +142,29 @@ export default {
   },
   setup() {
     const userInfo = ref(getUserInfo());
+    // 关于出租车位列表
+    const { rentList, rentListCount, rentParams } = useRentList();
     // 出租车位列表标题
     const rentTitle = ref({
       titleContent: "正在出租车位",
       titleButton: "我要共享",
     });
+    // 关于寻找车位列表
+    const { seekList, seekListCount, seekParams } = useSeekList();
     // 寻找车位列表标题
     const seekTitle = ref({
       titleContent: "正在寻找车位",
       titleButton: "我想使用",
     });
-    // 关于出租车位列表
-    const { rentList, rentListCount, rentParams } = useRentList();
-    // 关于寻找车位列表
-    const { seekList, seekListCount, seekParams } = useSeekList();
-    // 关于车位列表
-    const { carportList, getData } = useCarportList();
-    // 关于车辆列表
-    const { getCarData } = useCarList();
     // 控制弹框的显示与隐藏
     const rentVisible = ref(false);
     const seekVisible = ref(false);
     // 关于用户车位信息列表
-    const { carportList: userCarportList, getData: getUserData } =
+    const { carportList: userCarportList, getData: getCarportData } =
       useCarportList();
     // 点击我要共享按钮 显示车位信息弹框
     const rentCarport = async () => {
-      await getUserData({ uid: userInfo.value.id });
+      await getCarportData({ uid: userInfo.value.id });
       // 如果用户拥有车位
       if (userCarportList.value.length !== 0 && userInfo.value.id) {
         // 显示弹框
@@ -181,12 +177,9 @@ export default {
         message.warning("您还没有登录或者登录失效！");
       }
     };
-    // 关于用户车辆列表
-    const { carList: userCarList, getCarData: getUserCarData } = useCarList();
-    // 点击我要使用按钮 显示车辆弹框
-    const seekCarport = async () => {
-      await getUserCarData({ uid: userInfo.value.id });
-      seekVisible.value = true;
+    // 点击出租车位共享弹框的确定按钮的回调事件
+    const handleOkRent = (e) => {
+      console.log(e);
     };
     // 选中的车位
     const selectCarport = ref({});
@@ -200,6 +193,17 @@ export default {
         // 如果当前车位未被选中并且车位不处于禁用状态则选中
         selectCarport.value = carport;
       }
+    };
+    // 关于用户车辆列表
+    const { carList: userCarList, getData: getCarData } = useCarList();
+    // 点击我要使用按钮 显示车辆弹框
+    const seekCarport = async () => {
+      await getCarData({ uid: userInfo.value.id });
+      seekVisible.value = true;
+    };
+    // 点击寻找车位共享弹框的确定按钮的回调事件
+    const handleOkSeek = (e) => {
+      console.log(e);
     };
     // 选中的车
     const selectCarInfo = ref({});
@@ -217,14 +221,49 @@ export default {
         selectCarInfo.value = carInfo;
       }
     };
-    // 点击出租车位共享弹框的确定按钮的回调事件
-    const handleOkRent = (e) => {
-      console.log(e);
-    };
-    // 点击寻找车位共享弹框的确定按钮的回调事件
-    const handleOkSeek = (e) => {
-      console.log(e);
-    };
+    // 获取车位数据
+    getCarportData({ comid: 1 }).then((result) => {
+      result.forEach((item) => {
+        // 渲染车位模型
+        const carportGroup = useCarportModel(item.pname);
+        // 设置车位位置
+        carportGroup.position.set(item.x, item.y, item.z);
+        if (item.direction) {
+          // 设置车位方向
+          carportGroup.rotateY(Math.PI / item.direction);
+          // 设置车位位置
+          // carportGroup.position.set(item.x * 500, item.y * 200, item.z * 200);
+        } else {
+          // 设置车位位置
+          // carportGroup.position.set(item.x * 200, item.y * 200, item.z * 500);
+        }
+        TE.addObject(carportGroup);
+      });
+    });
+    // 获取车辆信息
+    getCarData({ comid: 1 }).then((result) => {
+      result.forEach(async (item) => {
+        // 渲染汽车模型
+        const carGroup = await useCarModel({
+          car: { name: "car-red" },
+          groupScale: 80,
+          color: new Color(
+            `#${((Math.random() * 0x1000000) << 0).toString(16)}00000`.slice(
+              0,
+              7
+            )
+          ),
+        });
+        // 设置车辆位置
+        carGroup.position.set(item.x, item.y, item.z);
+        if (item.direction) {
+          // 设置车辆方向
+          carGroup.rotateY(Math.PI / item.direction);
+        }
+        // 添加货物到场景中
+        TE.addObject(carGroup);
+      });
+    });
     // three 绑定的元素
     const threeRef = ref(null);
     // 实例化的 ThreeJS 引擎
@@ -232,7 +271,6 @@ export default {
     // DOM 渲染完成后执行
     onMounted(() => {
       TE = useTEngine(threeRef.value);
-
       // 自动调整渲染器大小
       window.onresize = () =>
         (() => {
@@ -242,50 +280,6 @@ export default {
             threeRef.value.clientHeight
           );
         })();
-
-      // 获取车位数据
-      getData({ comid: 1 }).then((result) => {
-        result.forEach((item) => {
-          // 渲染车位模型
-          const carportGroup = useCarportModel(item.pname);
-          // 设置车位位置
-          carportGroup.position.set(item.x, item.y, item.z);
-          if (item.direction) {
-            // 设置车位方向
-            carportGroup.rotateY(Math.PI / item.direction);
-            // 设置车位位置
-            // carportGroup.position.set(item.x * 500, item.y * 200, item.z * 200);
-          } else {
-            // 设置车位位置
-            // carportGroup.position.set(item.x * 200, item.y * 200, item.z * 500);
-          }
-          TE.addObject(carportGroup);
-        });
-      });
-      // 获取车辆信息
-      getCarData({ comid: 1 }).then((result) => {
-        result.forEach(async (item) => {
-          // 渲染汽车模型
-          const carGroup = await useCarModel({
-            car: { name: "car-red" },
-            groupScale: 80,
-            color: new Color(
-              `#${((Math.random() * 0x1000000) << 0).toString(16)}00000`.slice(
-                0,
-                7
-              )
-            ),
-          });
-          // 设置车辆位置
-          carGroup.position.set(item.x, item.y, item.z);
-          if (item.direction) {
-            // 设置车辆方向
-            carGroup.rotateY(Math.PI / item.direction);
-          }
-          // 添加货物到场景中
-          TE.addObject(carGroup);
-        });
-      });
     });
 
     return {
@@ -300,7 +294,6 @@ export default {
       rentCarport,
       rentVisible,
       handleOkRent,
-      carportList,
       userCarportList,
       selectCarport,
       selectCarportList,
@@ -343,7 +336,7 @@ function useCarList() {
   // 车信息列表
   const carList = ref([]);
   // 根据用户id 获取车信息
-  const getCarData = async ({ uid, comid }) => {
+  const getData = async ({ uid, comid }) => {
     const data = await getCar({ uid, comid }).catch((error) => {
       console.log(error);
     });
@@ -359,7 +352,7 @@ function useCarList() {
 
   return {
     carList,
-    getCarData,
+    getData,
   };
 }
 </script>
