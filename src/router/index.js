@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 const HomePage = () => import("@/views/home/index");
 const LoginPage = () => import("@/views/login/index");
+const CommunityPage = () => import("@/views/community/index");
 const MyPage = () => import("@/views/my/index");
 // 定义路由
 const routes = [
@@ -15,6 +16,12 @@ const routes = [
     path: "/login",
     name: "Login",
     component: LoginPage,
+  },
+  // 小区模块
+  {
+    path: "/community",
+    name: "Community",
+    component: CommunityPage,
   },
   // 个人中心模块
   {
