@@ -8,7 +8,9 @@
         <!--  轮播图区域  -->
         <Carousel :carousels="banners" :autoPlay="true" />
         <!--  小区列表展示  -->
-        <div class="home-community"></div>
+        <div class="home-community">
+          <a-table></a-table>
+        </div>
       </div>
       <!--  出租车位和寻找车位列表展示(具体功能在小区模块实现)  -->
       <div class="home-show">
