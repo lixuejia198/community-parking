@@ -1,7 +1,7 @@
 import { ref, watch } from "vue";
 import { getRentlist } from "@/api";
 // 获取出租车位列表数据
-export function useRentList() {
+export function useRentList({ page = 1, pageSize }) {
   // 出租车位列表
   const rentList = ref(null);
   // 出租车位列表总数量
@@ -9,9 +9,9 @@ export function useRentList() {
   // 出租车位列表分页参数
   const rentParams = ref({
     // 当前页
-    page: 1,
+    page: page,
     // 每页显示多少条数据
-    pageSize: 5,
+    pageSize: pageSize,
   });
   // 获取出租车位列表数据
   const getData = () => {

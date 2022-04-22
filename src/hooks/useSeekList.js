@@ -1,7 +1,7 @@
 import { ref, watch } from "vue";
 import { getSeeklist } from "@/api";
 // 获取寻找车位列表数据
-export function useSeekList() {
+export function useSeekList({ page = 1, pageSize }) {
   // 寻找车位列表
   const seekList = ref(null);
   // 寻找车位列表总数量
@@ -9,9 +9,9 @@ export function useSeekList() {
   // 寻找车位列表分页参数
   const seekParams = ref({
     // 当前页
-    page: 1,
+    page: page,
     // 每页显示多少条数据
-    pageSize: 5,
+    pageSize: pageSize,
   });
   // 获取寻找车位列表数据
   const getData = () => {

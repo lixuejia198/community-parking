@@ -143,14 +143,18 @@ export default {
   setup() {
     const userInfo = ref(getUserInfo());
     // 关于出租车位列表
-    const { rentList, rentListCount, rentParams } = useRentList();
+    const { rentList, rentListCount, rentParams } = useRentList({
+      pageSize: 5,
+    });
     // 出租车位列表标题
     const rentTitle = ref({
       titleContent: "正在出租车位",
       titleButton: "我要共享",
     });
     // 关于寻找车位列表
-    const { seekList, seekListCount, seekParams } = useSeekList();
+    const { seekList, seekListCount, seekParams } = useSeekList({
+      pageSize: 5,
+    });
     // 寻找车位列表标题
     const seekTitle = ref({
       titleContent: "正在寻找车位",
