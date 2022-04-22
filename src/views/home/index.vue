@@ -90,15 +90,10 @@ export default {
     .home-show {
       display: flex;
       height: 800px;
-      .home-show-rent {
-        width: 50%;
-        .rentOrSeek-list-content {
-          height: calc(100% - 60px);
-        }
-      }
+      .home-show-rent,
       .home-show-seek {
         width: 50%;
-        .rentOrSeek-list-content {
+        :deep(.rentOrSeek-list-content) {
           height: calc(100% - 60px);
         }
       }

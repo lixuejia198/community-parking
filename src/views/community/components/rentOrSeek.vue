@@ -4,7 +4,7 @@
       <h3>{{ title.titleContent }}</h3>
       <slot name="button" />
     </div>
-    <div class="rentOrSeek-list-content">
+    <div class="rentOrSeek-list-content" :style="{ height: height + 'px' }">
       <slot name="item" />
     </div>
     <slot name="pagination" />
@@ -15,8 +15,18 @@
 export default {
   name: "rentOrSeek",
   props: {
+    // 列表标题
     title: {
       type: Object,
+      default: () => ({
+        titleContent: "",
+        titleButton: "",
+      }),
+    },
+    // 列表内容高度
+    height: {
+      type: Number,
+      default: null,
     },
   },
   setup() {},
