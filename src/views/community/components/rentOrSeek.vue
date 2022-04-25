@@ -42,7 +42,7 @@ export default {
     justify-content: space-between;
     padding: 0 10px 10px;
     height: 50px;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #dfdfdf;
     h3 {
       line-height: 38px;
     }

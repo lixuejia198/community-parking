@@ -47,7 +47,7 @@ export default {
 <style lang="less" scoped>
 .login-info {
   height: 50px;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #dfdfdf;
   ul {
     height: 100%;
     display: flex;
