@@ -233,6 +233,9 @@ export default {
         :deep(.rentOrSeek-list-content) {
           height: calc(100% - 60px);
         }
+        :deep(.rentOrSeek-list-content-col3) {
+          flex: 0 0 7.5%;
+        }
       }
     }
   }
