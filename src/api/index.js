@@ -1,4 +1,4 @@
-import { requestWithoutToken } from "@/utils/request";
+import { requestWithoutToken, requestWithToken } from "@/utils/request";
 
 /***
  * 分页查询出租车位列表
@@ -18,4 +18,13 @@ export function getRentlist({ page = 1, limit = 6 }) {
  */
 export function getSeeklist({ page = 1, limit = 6 }) {
   return requestWithoutToken("/seeklist", "get", { page, limit });
+}
+
+/***
+ * 查询小区列表
+ * @param areaid 区id 默认是查询全部
+ * @returns {Promise}
+ */
+export function getCityList({ areaid }) {
+  return requestWithToken("/citylist", "get", { areaid });
 }
