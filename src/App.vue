@@ -5,8 +5,11 @@
 </template>
 
 <script>
+// 引入中文语言包
 import zhCN from "ant-design-vue/es/locale/zh_CN";
+// 使用 dayjs 作为时间库
 import dayjs from "dayjs";
+// 全局配置 dayjs 时间库的语言为中文
 import "dayjs/locale/zh-cn";
 dayjs.locale("zh-cn");
 
