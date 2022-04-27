@@ -5,13 +5,17 @@
       <slot name="itemButton" />
     </div>
     <a-row class="rentOrSeek-list-content-state">
-      <a-col :span="3"><span>状态</span></a-col>
+      <a-col :span="3" class="rentOrSeek-list-content-col3">
+        <span>状态</span>
+      </a-col>
       <a-col :span="21">
         <p>{{ rent.state === 0 ? "空闲" : "使用中" }}</p>
       </a-col>
     </a-row>
     <a-row class="rentOrSeek-list-content-time">
-      <a-col :span="3"><span>时间</span></a-col>
+      <a-col :span="3" class="rentOrSeek-list-content-col3">
+        <span>时间</span>
+      </a-col>
       <a-col :span="21">
         <p>
           可使用时间为{{ new Date(rent.starttime).toLocaleString() }}-
@@ -20,7 +24,9 @@
       </a-col>
     </a-row>
     <a-row class="rentOrSeek-list-content-place">
-      <a-col :span="3"><span>位置</span></a-col>
+      <a-col :span="3" class="rentOrSeek-list-content-col3">
+        <span>位置</span>
+      </a-col>
       <a-col :span="21">
         <p>{{ rent.comname }}({{ rent.place }})</p>
       </a-col>
