@@ -15,4 +15,19 @@ li {
   list-style: none;
 }
 
-
+/* 隐藏 Ant Design Vue 日期选择框禁用时间 */
+/* 时 */
+/*.hied-ant-picker-time-panel-cell-disabled .ant-picker-time-panel-column :nth-child(1) .ant-picker-time-panel-cell-disabled {*/
+/*  height: 0;*/
+/*  font-size: 0;*/
+/*}*/
+/* 分 */
+.hied-ant-picker-time-panel-cell-disabled .ant-picker-time-panel-column :nth-child(2) .ant-picker-time-panel-cell-disabled {
+  height: 0;
+  font-size: 0;
+}
+/* 秒 */
+.hied-ant-picker-time-panel-cell-disabled .ant-picker-time-panel-column :nth-child(3) .ant-picker-time-panel-cell-disabled {
+  height: 0;
+  font-size: 0;
+}
