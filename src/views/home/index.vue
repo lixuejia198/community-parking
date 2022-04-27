@@ -19,9 +19,9 @@
           />
           <!--  表格 -->
           <a-table
-            :columns="cityListColumns"
+            :columns="communityListColumns"
             :data-source="
-              cityListData.filter(
+              communityListData.filter(
                 (item) => !currentAreaId || item.area_id === currentAreaId
               )
             "
@@ -83,7 +83,7 @@ import { useRentList } from "@/hooks/useRentList";
 import { useSeekList } from "@/hooks/useSeekList";
 import SeekItem from "@/views/community/components/seekItem";
 import { computed, ref } from "vue";
-import { getCityList } from "@/api";
+import { getCommunityList } from "@/api";
 import { useRouter } from "vue-router";
 
 export default {
@@ -124,7 +124,7 @@ export default {
     // 级联选择框数据的id
     const value = ref([]);
     // 获取所有小区列表数据
-    getCityList({}).then((data) => {
+    getCommunityList({}).then((data) => {
       console.log(data, "data");
       // 存储所有小区数据
       options.value = [
@@ -151,7 +151,7 @@ export default {
     // 当前区id
     let currentAreaId = ref(null);
     // 所有小区列表表格体数据
-    const cityListData = computed(() => {
+    const communityListData = computed(() => {
       const result = [];
       options.value.forEach((province) => {
         province?.children?.forEach((city) => {
@@ -163,7 +163,7 @@ export default {
       return result;
     });
     // 所有小区列表表格头数据
-    const cityListColumns = [
+    const communityListColumns = [
       { title: "小区", dataIndex: "comname", width: "25%" },
       { title: "地址", dataIndex: "place" },
       { title: "操作", key: "operation", width: "25%" },
@@ -183,10 +183,10 @@ export default {
       rentList,
       seekList,
       options,
-      cityListData,
+      communityListData,
       currentAreaId,
       value,
-      cityListColumns,
+      communityListColumns,
       onChange,
       goToCommunity,
     };

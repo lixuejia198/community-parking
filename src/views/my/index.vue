@@ -47,7 +47,28 @@
     <!--  用户车位车辆添加表单  -->
     <div class="my-center-operation">
       <!--  用户添加车位表单  -->
-      <a-form></a-form>
+      <a-form name="carport-form" :model="carportFormState">
+        <a-form-item label="省市区" name="proCityArea">
+          <!--  级联选择框  -->
+          <a-cascader
+            v-model:value="carportFormState.proCityArea"
+            :options="options"
+            placeholder="请选择"
+            @change="onChange"
+            :style="{ marginLeft: '8px', width: '60%' }"
+          />
+        </a-form-item>
+        <a-form-item label="小区" name="community">
+          <a-select
+            v-model:value="carportFormState.community"
+            style="width: 60%"
+          >
+            <a-select-option value="jack">Jack</a-select-option>
+            <a-select-option value="lucy">Lucy</a-select-option>
+            <a-select-option value="Yiminghe">yiminghe</a-select-option>
+          </a-select>
+        </a-form-item>
+      </a-form>
       <!--  用户添加车辆表单  -->
       <a-form></a-form>
     </div>
@@ -101,6 +122,7 @@ import { useCarportList } from "@/hooks/useCarportList";
 import { ref } from "vue";
 import { getUserInfo } from "@/utils/getUserInfo";
 import { useCarList } from "@/hooks/useCarList";
+import { getCommunityList } from "@/api";
 
 export default {
   name: "My",
@@ -114,12 +136,31 @@ export default {
     // 关于用户车辆信息列表
     const { carList, getData: getCarData } = useCarList();
     getCarData({ uid: userInfo.value.id });
-
+    // 关于用户车位表单数据
+    const carportFormState = ref({
+      //  省市区id
+      proCityArea: "",
+      //  小区
+      community: "",
+    });
+    // 级联选择框数据(所有小区数据)
+    const options = ref([]);
+    // 获取所有小区列表数据
+    getCommunityList({}).then((data) => {
+      // console.log(data, "data");
+      // 存储所有小区数据
+      options.value = data.data;
+    });
+    // 当级联选择框选择完成后的回调
+    const onChange = () => {};
     return {
       carportValue,
       carportList,
       carValue,
       carList,
+      carportFormState,
+      options,
+      onChange,
     };
   },
 };

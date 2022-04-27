@@ -25,6 +25,6 @@ export function getSeeklist({ page = 1, limit = 6 }) {
  * @param areaid 区id 默认是查询全部
  * @returns {Promise}
  */
-export function getCityList({ areaid }) {
+export function getCommunityList({ areaid }) {
   return requestWithToken("/citylist", "get", { areaid });
 }
