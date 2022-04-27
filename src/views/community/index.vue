@@ -136,8 +136,7 @@ import { onMounted, ref } from "vue";
 import RentItem from "@/views/community/components/rentItem";
 import SeekItem from "@/views/community/components/seekItem";
 import CpPagination from "@/components/CpPagination";
-import { getCarport, rentCarportApi } from "@/api/carport";
-import { getCar } from "@/api/car";
+import { rentCarportApi } from "@/api/carport";
 import { message } from "ant-design-vue";
 import { getUserInfo } from "@/utils/getUserInfo";
 import { useTEngine } from "@/hooks/useTEngine";
@@ -150,6 +149,8 @@ import TopNav from "@/components/TopNav";
 import dayjs from "dayjs";
 import { useRoute, useRouter } from "vue-router";
 import { useRentCarport } from "@/hooks/useRentCarport";
+import { useCarList } from "@/hooks/useCarList";
+import { useCarportList } from "@/hooks/useCarportList";
 
 export default {
   name: "Community",
@@ -518,54 +519,6 @@ export default {
     };
   },
 };
-// 获取车位数据
-function useCarportList() {
-  // 车位列表
-  const carportList = ref([]);
-  // 根据用户id 获取车位信息
-  const getData = async ({ uid, comid }) => {
-    const data = await getCarport({ uid, comid }).catch((error) => {
-      console.log(error);
-    });
-    console.log(data, "data");
-    // 如果返回的状态码为200(不过得先判断data是否为undefined)
-    if (data?.status === 200) {
-      // 存储用户车位信息
-      carportList.value = data.data;
-      return data.data;
-    }
-    return [];
-  };
-
-  return {
-    carportList,
-    getData,
-  };
-}
-// 获取车辆数据
-function useCarList() {
-  // 车信息列表
-  const carList = ref([]);
-  // 根据用户id 获取车信息
-  const getData = async ({ uid, comid }) => {
-    const data = await getCar({ uid, comid }).catch((error) => {
-      console.log(error);
-    });
-    console.log(data, "data");
-    // 如果返回的状态码为200(不过得先判断data是否为undefined)
-    if (data?.status === 200) {
-      // 存储用户车辆
-      carList.value = data.data;
-      return data.data;
-    }
-    return [];
-  };
-
-  return {
-    carList,
-    getData,
-  };
-}
 </script>
 
 <style scoped lang="less">
