@@ -36,3 +36,13 @@ export function rentCarportApi({ starttime, endtime, comid, pid }) {
     pid,
   });
 }
+
+/***
+ * 用户添加车位
+ * @param pid 车位id
+ * @param uid 用户id
+ * @returns {Promise}
+ */
+export function userBindCarportApi({ pid, uid }) {
+  return requestWithToken("/carport/bind_user", "post", { pid, uid });
+}
