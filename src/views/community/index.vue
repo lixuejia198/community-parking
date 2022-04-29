@@ -90,8 +90,8 @@
         :placeholder="['开始时间', '结束时间']"
         :showTime="{
           defaultValue: [
-            dayjs(dayjs().get('hour') + 1 + ':00:00', 'HH:mm:ss'),
-            dayjs(dayjs().get('hour') + 1 + ':59:59', 'HH:mm:ss'),
+            dayjs(dayjs().startOf('day'), 'mm:ss'),
+            dayjs(dayjs().endOf('day'), 'mm:ss'),
           ],
         }"
         :disabledDate="rentDisableDate"
@@ -151,6 +151,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useRentCarport } from "@/hooks/useRentCarport";
 import { useCarList } from "@/hooks/useCarList";
 import { useCarportList } from "@/hooks/useCarportList";
+import { computeDisabledTime } from "@/utils/computeDisabledTime";
 
 export default {
   name: "Community",
@@ -218,150 +219,36 @@ export default {
       startTime: "",
       endTime: "",
     });
-    // 共享车位默认时间
+    // 最大可选结束时间
+    let maxSelectEndDate = null;
+    // 共享车位禁用日期
     const rentDisableDate = (current) => {
-      // console.log("current", current.valueOf(), dayjs().endOf("day").valueOf());
-      return current && current < dayjs().endOf("day").subtract(1, "day");
+      return (
+        current &&
+        (current < dayjs().startOf("day") ||
+          (maxSelectEndDate && current > dayjs(maxSelectEndDate).add(1, "day")))
+      );
     };
-    const range = (start, end) => {
-      const result = [];
 
-      for (let i = start; i <= end; i++) {
-        result.push(i);
-      }
-
-      return result;
-    };
     // 查询车位被被共享的时间
     const { rentCarportList, getData: getRentCarportList } = useRentCarport();
-    // 当前选择的开始日期
-    let startDate = dayjs().format("YYYY-MM-DD");
+    // 当前选择的开始时间
+    let currentStartDate = dayjs();
     // 共享车位禁用时间
     const rentDisabledRangeTime = (current, type) => {
-      // 当前选择的日期
-      const currentSelectDate = dayjs(current).format("YYYY-MM-DD");
-      // 当前日期
-      const currentDate = dayjs().format("YYYY-MM-DD");
-      // 需要禁用的小时
-      let disabledHours = [];
-      let endDisabledHours = [];
-
-      if (type === "start") {
-        // 设置开始日期
-        startDate = dayjs(current);
-        // 判断当前时间是否是未来的日期
-        if (currentSelectDate > currentDate) {
-          // 如果是未来的日期
-          rentCarportList.value.forEach((item) => {
-            if (
-              dayjs(item.starttime).format("YYYY-MM-DD") < currentSelectDate &&
-              dayjs(item.endtime).format("YYYY-MM-DD") > currentSelectDate
-            ) {
-              // 如果是在被共享的时间内
-              disabledHours = [...disabledHours, ...range(0, 24)];
-            } else if (
-              dayjs(item.starttime).format("YYYY-MM-DD") === currentSelectDate
-            ) {
-              // 如果是在被共享开始的那天
-              disabledHours = [
-                ...disabledHours,
-                ...range(dayjs(item.starttime).get("hour"), 24),
-              ];
-            } else if (
-              dayjs(item.endtime).format("YYYY-MM-DD") === currentSelectDate
-            ) {
-              // 如果是在被共享结束的那天
-              disabledHours = [
-                ...disabledHours,
-                ...range(0, dayjs(item.endtime).get("hour")),
-              ];
-            }
-          });
-        } else if (currentSelectDate === currentDate) {
-          // 如果是当天
-          disabledHours = [...disabledHours, ...range(0, dayjs().get("hour"))];
-        } else if (currentSelectDate < currentDate) {
-          // 如果是过去的日期
-          disabledHours = [...disabledHours, ...range(0, 24)];
-        }
-        return {
-          disabledHours: () => disabledHours,
-          disabledMinutes: () => [...range(1, 29), ...range(31, 59)],
-          disabledSeconds: () => range(1, 59),
-        };
-      } else if (type === "end") {
-        // 判断当前时间是否是开始时间之后未来的日期
-        if (currentSelectDate > startDate.format("YYYY-MM-DD")) {
-          rentCarportList.value.forEach((item) => {
-            if (
-              dayjs(item.starttime).format("YYYY-MM-DD") < currentSelectDate &&
-              dayjs(item.endtime).format("YYYY-MM-DD") > currentSelectDate
-            ) {
-              // 如果是在被共享的时间内
-              endDisabledHours = [...endDisabledHours, ...range(0, 24)];
-            } else if (
-              dayjs(item.starttime).format("YYYY-MM-DD") === currentSelectDate
-            ) {
-              // 如果是在被共享开始的那天
-              endDisabledHours = [
-                ...endDisabledHours,
-                ...range(
-                  dayjs(startDate).get("hour"),
-                  dayjs(item.endtime).get("hour")
-                ),
-              ];
-            } else if (
-              dayjs(item.endtime).format("YYYY-MM-DD") === currentSelectDate
-            ) {
-              // 如果是在被共享结束的那天
-              endDisabledHours = [
-                ...endDisabledHours,
-                ...range(0, dayjs(item.endtime).get("hour")),
-              ];
-            }
-          });
-        } else if (currentSelectDate === startDate.format("YYYY-MM-DD")) {
-          // 如果是开始时间的那天
-          // 获取结束时间大于开始时间的订单
-          const afterStartDate = rentCarportList.value.filter(
-            (item) =>
-              dayjs(item.endtime).format("YYYY-MM-DD") >
-              startDate.format("YYYY-MM-DD")
-          );
-          // 获取结束时间等于开始时间的订单并按结束时间降序排序
-          const equalStartDate = rentCarportList.value
-            .filter(
-              (item) =>
-                dayjs(item.endtime).format("YYYY-MM-DD") ===
-                startDate.format("YYYY-MM-DD")
-            )
-            .sort((a, b) => b - a);
-
-          // 如果结束日期当天
-          endDisabledHours = [
-            ...endDisabledHours,
-            ...range(
-              dayjs(startDate).get("hour"),
-              afterStartDate.length > 0
-                ? 24
-                : equalStartDate.length > 0
-                ? dayjs(equalStartDate[0].endtime).get("hour")
-                : 24
-            ),
-          ];
-        } else if (currentSelectDate < startDate.format("YYYY-MM-DD")) {
-          console.log(3);
-          // 如果是开始日期之前的日期
-          endDisabledHours = [...endDisabledHours, ...range(0, 24)];
-        }
-        return {
-          disabledHours: () => endDisabledHours,
-          disabledMinutes: () => [...range(1, 29), ...range(31, 59)],
-          disabledSeconds: () => range(1, 59),
-        };
+      const { startDate, maxEndDate, disabled } = computeDisabledTime(
+        rentCarportList.value,
+        current,
+        type,
+        currentStartDate
+      );
+      if (startDate && type === "start") {
+        currentStartDate = startDate;
       }
-      return {};
+      maxSelectEndDate = maxEndDate;
+      return current && disabled;
     };
+
     const onRangeOk = (value) => {
       console.log("onOk: ", value);
       rentTime.value.startTime = value[0]?.format("YYYY-MM-DD HH:mm:ss");
