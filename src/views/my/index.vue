@@ -35,7 +35,7 @@
             </span>
           </div>
         </div>
-        <div class="my-left-carport-add">
+        <div class="my-left-carport-add" @click="isShowCarportForm = true">
           <span class="horizontal"></span>
           <span class="vertical"></span>
         </div>
@@ -47,7 +47,11 @@
     <!--  用户车位车辆添加表单  -->
     <div class="my-center-operation">
       <!--  用户添加车位表单  -->
-      <a-form name="carport-form" :model="carportFormState">
+      <a-form
+        name="carport-form"
+        :model="carportFormState"
+        v-show="isShowCarportForm"
+      >
         <a-form-item label="省市区" name="proCityArea">
           <!--  级联选择框  -->
           <a-cascader
@@ -79,13 +83,21 @@
           >
             <template #renderItem="{ item }">
               <a-badge-ribbon
-                text="已拥有"
-                color="#f50"
+                :text="
+                  item.uid !== userInfo.id && item.uid !== null
+                    ? '已占用'
+                    : '已拥有'
+                "
+                :color="
+                  item.uid !== userInfo.id && item.uid !== null
+                    ? 'orange'
+                    : '#87d068'
+                "
                 :style="{
                   opacity:
                     carportList.findIndex(
                       (carport) => carport.id === item.id
-                    ) !== -1
+                    ) !== -1 || item.uid !== null
                       ? 1
                       : 0,
                 }"
@@ -106,7 +118,8 @@
                       disabled:
                         carportList.findIndex(
                           (carport) => carport.id === item.id
-                        ) !== -1,
+                        ) !== -1 ||
+                        (item.uid !== null && item.uid !== userInfo.id),
                     }"
                   >
                     <a-list-item-meta>
@@ -128,6 +141,10 @@
           </a-list>
         </a-form-item>
       </a-form>
+      <a-empty
+        description="可以点击加号添加车位或车辆哦"
+        v-show="!isShowCarportForm"
+      />
       <!--  用户添加车辆表单  -->
       <a-form></a-form>
     </div>
@@ -247,20 +264,20 @@ export default {
     const onCommunityTagChange = (id) => {
       carportFormState.value.community = id;
       getAllCarport({ comid: id });
-      console.log(allCarportList, "allCarportList");
+      // console.log(allCarportList, "allCarportList");
     };
     // 点击车位列表项时的回调
     const onCarportSelected = (id) => {
       carportFormState.value.carportId = id;
-      console.log(carportFormState.value, "carportFormState");
+      // console.log(carportFormState.value, "carportFormState");
     };
+    // 点击气泡确认框取消按钮的回调
     const onCancelSelectedCarport = () => {
       carportFormState.value.carportId = "";
     };
     // 点击气泡确认框确定按钮的回调
-    const carportBindUser = (e) => {
-      console.log(e);
-      console.log(carportFormState.value, "carportFormState");
+    const carportBindUser = () => {
+      // console.log(carportFormState.value, "carportFormState");
       console.log(userInfo.value.id);
       userBindCarportApi({
         pid: carportFormState.value.carportId,
@@ -273,7 +290,11 @@ export default {
         }
       });
     };
+    // 控制用户添加车位表单的显示与隐藏
+    const isShowCarportForm = ref(false);
+
     return {
+      userInfo,
       carportValue,
       carportList,
       carValue,
@@ -287,6 +308,7 @@ export default {
       onCarportSelected,
       onCancelSelectedCarport,
       carportBindUser,
+      isShowCarportForm,
     };
   },
 };
