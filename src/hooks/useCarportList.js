@@ -17,6 +17,7 @@ export function useCarportList() {
       carportList.value = data.data;
       return data.data;
     }
+    carportList.value = [];
     return [];
   };
 
