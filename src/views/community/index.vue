@@ -56,51 +56,12 @@
       </div>
     </div>
   </div>
-  <!-- 出租车位弹框 -->
-  <a-modal
-    v-model:visible="rentVisible"
-    title="请选择你要共享的车位"
-    cancelText="取消"
-    okText="确定"
-    @ok="handleOkRent"
-  >
-    <div
-      v-for="carport in userCarportList"
-      :key="carport.id"
-      class="modal-com-item"
-      :class="{
-        active: selectCarport.id === carport.id && carport.state === 0,
-        disabled: carport.state === 1,
-      }"
-      @mouseenter="(e) => e.target.classList.add('hover')"
-      @mouseleave="(e) => e.target.classList.remove('hover')"
-      @click="selectCarportList(carport)"
-    >
-      <p>ID：{{ carport.id }}</p>
-      <p>小区：{{ carport.comname }}</p>
-      <p>地址：{{ carport.place }}</p>
-      <div class="model-com-name">
-        {{ carport.pname }}
-      </div>
-    </div>
-    <div class="modal-com-form">
-      <a-range-picker
-        dropdownClassName="hied-ant-picker-time-panel-cell-disabled"
-        v-show="selectCarport.id"
-        :placeholder="['开始时间', '结束时间']"
-        :showTime="{
-          defaultValue: [
-            dayjs(dayjs().startOf('day'), 'mm:ss'),
-            dayjs(dayjs().endOf('day'), 'mm:ss'),
-          ],
-        }"
-        :disabledDate="rentDisableDate"
-        :disabledTime="rentDisabledRangeTime"
-        showToday
-        @ok="onRangeOk"
-      />
-    </div>
-  </a-modal>
+  <!-- 共享车位弹框 -->
+  <rent-modal
+    :visible="rentVisible"
+    :toggleVisible="toggleRentModalVisible"
+    :userCarportList="userCarportList"
+  />
   <!-- 寻找车位弹框 -->
   <a-modal
     v-model:visible="seekVisible"
@@ -123,7 +84,7 @@
     >
       <p>ID：{{ carInfo.id }}</p>
       <p>车牌号：{{ carInfo.cname }}</p>
-      <div class="model-com-name">
+      <div class="modal-com-name">
         {{ carInfo.cname }}
       </div>
     </div>
@@ -136,7 +97,6 @@ import { onMounted, ref } from "vue";
 import RentItem from "@/views/community/components/rentItem";
 import SeekItem from "@/views/community/components/seekItem";
 import CpPagination from "@/components/CpPagination";
-import { rentCarportApi } from "@/api/carport";
 import { message } from "ant-design-vue";
 import { getUserInfo } from "@/utils/getUserInfo";
 import { useTEngine } from "@/hooks/useTEngine";
@@ -148,14 +108,14 @@ import { useSeekList } from "@/hooks/useSeekList";
 import TopNav from "@/components/TopNav";
 import dayjs from "dayjs";
 import { useRoute, useRouter } from "vue-router";
-import { useRentCarport } from "@/hooks/useRentCarport";
 import { useCarList } from "@/hooks/useCarList";
 import { useCarportList } from "@/hooks/useCarportList";
-import { computeDisabledTime } from "@/utils/computeDisabledTime";
+import RentModal from "@/views/community/components/rentModal";
 
 export default {
   name: "Community",
   components: {
+    RentModal,
     TopNav,
     CpPagination,
     SeekItem,
@@ -174,16 +134,16 @@ export default {
     }
 
     const userInfo = ref(getUserInfo());
-    // 关于出租车位列表
+    // 出租车位列表
     const { rentList, rentListCount, rentParams } = useRentList({
       pageSize: 5,
     });
     // 出租车位列表标题
     const rentTitle = ref({
-      titleContent: "正在出租车位",
+      titleContent: "正在共享车位",
       titleButton: "我要共享",
     });
-    // 关于寻找车位列表
+    // 寻找车位列表
     const { seekList, seekListCount, seekParams } = useSeekList({
       pageSize: 5,
     });
@@ -192,10 +152,14 @@ export default {
       titleContent: "正在寻找车位",
       titleButton: "我想使用",
     });
-    // 控制弹框的显示与隐藏
+
+    // 共享车位弹框显示状态
     const rentVisible = ref(false);
-    const seekVisible = ref(false);
-    // 关于用户车位信息列表
+    // 修改共享车位弹框的显示与隐藏
+    const toggleRentModalVisible = (state) => {
+      rentVisible.value = state ? state : !rentVisible.value;
+    };
+    // 获取车位信息列表
     const { carportList: userCarportList, getData: getCarportData } =
       useCarportList();
     // 点击我要共享按钮 显示车位信息弹框
@@ -214,74 +178,8 @@ export default {
       }
     };
 
-    // 共享车位时间
-    const rentTime = ref({
-      startTime: "",
-      endTime: "",
-    });
-    // 最大可选结束时间
-    let maxSelectEndDate = null;
-    // 共享车位禁用日期
-    const rentDisableDate = (current) => {
-      return (
-        current &&
-        (current < dayjs().startOf("day") ||
-          (maxSelectEndDate && current > dayjs(maxSelectEndDate).add(1, "day")))
-      );
-    };
-
-    // 查询车位被被共享的时间
-    const { rentCarportList, getData: getRentCarportList } = useRentCarport();
-    // 当前选择的开始时间
-    let currentStartDate = dayjs();
-    // 共享车位禁用时间
-    const rentDisabledRangeTime = (current, type) => {
-      const { startDate, maxEndDate, disabled } = computeDisabledTime(
-        rentCarportList.value,
-        current,
-        type,
-        currentStartDate
-      );
-      if (startDate && type === "start") {
-        currentStartDate = startDate;
-      }
-      maxSelectEndDate = maxEndDate;
-      return current && disabled;
-    };
-
-    const onRangeOk = (value) => {
-      console.log("onOk: ", value);
-      rentTime.value.startTime = value[0]?.format("YYYY-MM-DD HH:mm:ss");
-      rentTime.value.endTime = value[1]?.format("YYYY-MM-DD HH:mm:ss");
-    };
-    // 点击出租车位共享弹框的确定按钮的回调事件
-    const handleOkRent = (e) => {
-      console.log("handleOkRent===", e, selectCarport.value, rentTime.value);
-      rentCarportApi({
-        starttime: rentTime.value.startTime,
-        endtime: rentTime.value.endTime,
-        comid: selectCarport.value.comid,
-        pid: selectCarport.value.id,
-      }).then((result) => {
-        console.log(result);
-      });
-    };
-
-    // 选中的车位
-    const selectCarport = ref({});
-    // 选中车位
-    const selectCarportList = (carport) => {
-      // 如果当前选中的车位和上次选中的车位一样
-      if (carport.id === selectCarport.value.id) {
-        // 就取消选中
-        selectCarport.value = {};
-      } else if (carport.id !== selectCarport.value.id && carport.state === 0) {
-        // 如果当前车位未被选中并且车位不处于禁用状态则选中
-        selectCarport.value = carport;
-        // 获取车位被共享的时间
-        getRentCarportList({ pid: carport.id });
-      }
-    };
+    // 控制寻找弹框的显示与隐藏
+    const seekVisible = ref(false);
     // 关于用户车辆列表
     const { carList: userCarList, getData: getCarData } = useCarList();
     // 点击我要使用按钮 显示车辆弹框
@@ -387,11 +285,7 @@ export default {
       seekListCount,
       seekList,
       rentCarport,
-      rentVisible,
-      handleOkRent,
       userCarportList,
-      selectCarport,
-      selectCarportList,
       threeRef,
       seekVisible,
       handleOkSeek,
@@ -399,10 +293,9 @@ export default {
       userCarList,
       selectCarInfo,
       selectUserCarList,
-      onRangeOk,
-      rentDisableDate,
-      rentDisabledRangeTime,
       dayjs,
+      rentVisible,
+      toggleRentModalVisible,
     };
   },
 };
@@ -494,7 +387,7 @@ export default {
   padding: 10px;
   margin-bottom: 10px;
   position: relative;
-  .model-com-name {
+  .modal-com-name {
     position: absolute;
     top: 0;
     right: 10px;
@@ -517,7 +410,7 @@ export default {
   background-color: #ff7300;
   border: 1px solid #ffd591;
   color: #fff;
-  .model-com-name {
+  .modal-com-name {
     color: #fff;
   }
 }
