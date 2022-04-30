@@ -33,20 +33,17 @@ export const computeDisabledTime = (list, current, type, startDate) => {
       console.log("当前选择的日期等于当前日期");
       // 如果等于 则禁用当前时间之前的 时分秒
       disabledHours = range(0, dayjs().hour());
-      // disabledMinutes = range(0, dayjs().minute());
-      // disabledSeconds = range(0, dayjs().second());
+      if (currentSelectDate.hour() === dayjs().hour()) {
+        disabledMinutes = range(0, dayjs().minute());
+        if (currentSelectDate.minute() === dayjs().minute()) {
+          disabledSeconds = range(0, dayjs().second());
+        }
+      }
     } else if (currentSelectDate.isAfter(dayjs(), "day")) {
       console.log("当前选择的日期大于当前日期");
     }
   }
-
   if (type === "start") {
-    const sameStartDate = list
-      .filter((item) => currentSelectDate.isSame(dayjs(item.starttime), "day"))
-      .sort((a, b) => dayjs(a.starttime) - dayjs(b.starttime))[0];
-    const sameEndDate = list
-      .filter((item) => currentSelectDate.isSame(dayjs(item.endtime), "day"))
-      .sort((a, b) => dayjs(a.endtime) - dayjs(b.endtime))[0];
     // 判断当前选择的日期是否在日期列表中
     if (
       list.some(
@@ -59,14 +56,44 @@ export const computeDisabledTime = (list, current, type, startDate) => {
       disabledHours = range(0, 23);
       disabledMinutes = range(0, 59);
       disabledSeconds = range(0, 59);
-    } else if (sameStartDate) {
-      disabledHours = range(dayjs(sameStartDate.starttime).hour(), 23);
-      disabledMinutes = range(dayjs(sameStartDate.starttime).minute(), 59);
-      disabledSeconds = range(dayjs(sameStartDate.starttime).second(), 59);
-    } else if (sameEndDate) {
-      disabledHours = range(0, dayjs(sameEndDate.endtime).hour());
-      disabledMinutes = range(0, dayjs(sameEndDate.endtime).minute());
-      disabledSeconds = range(0, dayjs(sameEndDate.endtime).second());
+    } else {
+      const sameStartDate = list
+        .filter((item) =>
+          currentSelectDate.isSame(dayjs(item.starttime), "day")
+        )
+        .sort((a, b) => dayjs(a.starttime) - dayjs(b.starttime))[0];
+      const sameEndDate = list
+        .filter((item) => currentSelectDate.isSame(dayjs(item.endtime), "day"))
+        .sort((a, b) => dayjs(a.endtime) - dayjs(b.endtime))[0];
+
+      if (sameStartDate) {
+        disabledHours = range(dayjs(sameStartDate.starttime).hour(), 23);
+        if (
+          currentSelectDate.hour() === dayjs(sameStartDate.starttime).hour()
+        ) {
+          disabledMinutes = range(dayjs(sameStartDate.starttime).minute(), 59);
+          if (
+            currentSelectDate.minute() ===
+            dayjs(sameStartDate.starttime).minute()
+          ) {
+            disabledSeconds = range(
+              dayjs(sameStartDate.starttime).second(),
+              59
+            );
+          }
+        }
+      }
+      if (sameEndDate) {
+        disabledHours = range(0, dayjs(sameEndDate.endtime).hour());
+        if (currentSelectDate.hour() === dayjs(sameEndDate.endtime).hour()) {
+          disabledMinutes = range(0, dayjs(sameEndDate.endtime).minute());
+          if (
+            currentSelectDate.minute() === dayjs(sameEndDate.endtime).minute()
+          ) {
+            disabledSeconds = range(0, dayjs(sameEndDate.endtime).second());
+          }
+        }
+      }
     }
   } else if (type === "end") {
     // 判断是否选择了开始时间
@@ -102,8 +129,23 @@ export const computeDisabledTime = (list, current, type, startDate) => {
         ) {
           console.log("===当前选择的日期等于开始日期");
           disabledHours = range(dayjs(recentStartDate.starttime).hour(), 23);
-          // disabledMinutes = range(dayjs(recentStartDate.starttime).minute(), 59);
-          // disabledSeconds = range(dayjs(recentStartDate.starttime).second(), 59);
+          if (
+            currentSelectDate.hour() === dayjs(recentStartDate.starttime).hour()
+          ) {
+            disabledMinutes = range(
+              dayjs(recentStartDate.starttime).minute(),
+              59
+            );
+            if (
+              currentSelectDate.minute() ===
+              dayjs(recentStartDate.starttime).minute()
+            ) {
+              disabledSeconds = range(
+                dayjs(recentStartDate.starttime).second(),
+                59
+              );
+            }
+          }
         } else if (
           currentSelectDate.isBefore(dayjs(recentStartDate.starttime), "day")
         ) {
