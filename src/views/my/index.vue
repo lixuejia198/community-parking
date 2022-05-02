@@ -151,6 +151,7 @@
         :rules="carFormRules"
         :model="carFormState"
         v-show="isShowCarForm"
+        @finish="carFormFinish"
       >
         <a-form-item label="车牌号" name="cname">
           <a-input v-model:value="carFormState.cname" />
@@ -340,19 +341,24 @@ export default {
     // 关于用户车辆表单校验规则
     const carFormRules = {
       cname: [{ required: true, validator: checkCarName, trigger: "change" }],
-      color: [{ required: true }],
+      color: [{ required: true, message: "请选择您的车颜色！" }],
     };
     // 用于存储当前用户车辆颜色
     const currentCarColor = ref("");
     // 点击用户车辆颜色项的回调
     const carColorSelected = (color) => {
       currentCarColor.value = color;
+      console.log(currentCarColor.value);
     };
     // 控制用户添加车辆表单的显示与隐藏
     const isShowCarForm = ref(false);
     const changeCarForm = () => {
       isShowCarForm.value = true;
       isShowCarportForm.value = false;
+    };
+    // 提交用户添加车辆表单且数据验证成功后回调事件
+    const carFormFinish = (values) => {
+      console.log(values);
     };
 
     return {
@@ -379,6 +385,7 @@ export default {
       isShowCarForm,
       carColorSelected,
       currentCarColor,
+      carFormFinish,
     };
   },
 };
@@ -512,7 +519,7 @@ export default {
           border-radius: 50%;
           border: 1px solid #ccc;
           &.active {
-            box-shadow: 0 0 10px #ff0000;
+            box-shadow: 0 0 10px #40a9ff;
           }
         }
       }
