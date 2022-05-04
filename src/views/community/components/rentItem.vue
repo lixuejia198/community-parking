@@ -9,7 +9,7 @@
         <span>状态</span>
       </a-col>
       <a-col :span="21">
-        <p>{{ rent.state === 0 ? "空闲" : "使用中" }}</p>
+        <p>{{ rent.cid ? "使用中" : "空闲" }}</p>
       </a-col>
     </a-row>
     <a-row class="rentOrSeek-list-content-time">

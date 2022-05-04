@@ -9,7 +9,7 @@
         <span>状态</span>
       </a-col>
       <a-col :span="21">
-        <p>{{ seek.state === 0 ? "未解决" : "已解决" }}</p>
+        <p>{{ seek.comid ? "已解决" : "未解决" }}</p>
       </a-col>
     </a-row>
     <a-row class="rentOrSeek-list-content-time">
@@ -23,7 +23,7 @@
         </p>
       </a-col>
     </a-row>
-    <a-row class="rentOrSeek-list-content-place">
+    <a-row class="rentOrSeek-list-content-place" v-if="seek.comid">
       <a-col :span="3" class="rentOrSeek-list-content-col3">
         <span>位置</span>
       </a-col>

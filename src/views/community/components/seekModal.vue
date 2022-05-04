@@ -1,32 +1,31 @@
 <template>
   <a-modal
     :visible="visible"
-    title="请选择你要共享的车位"
+    title="请选择你所需要车位的车"
     cancelText="取消"
     okText="确定"
-    @ok="handleOkRent"
+    @ok="handleOkSeek"
     @cancel="handleCancel"
   >
     <div
-      v-for="carport in userCarportList"
-      :key="carport.id"
+      v-for="car in userCarList"
+      :key="car.id"
       class="modal-com-item"
-      :class="{ active: selectCarport.id === carport.id }"
+      :class="{ active: selectCar.id === car.id }"
       @mouseenter="(e) => e.target.classList.add('hover')"
       @mouseleave="(e) => e.target.classList.remove('hover')"
-      @click="selectCarportList(carport)"
+      @click="selectUserCarList(car)"
     >
-      <p>ID：{{ carport.id }}</p>
-      <p>小区：{{ carport.comname }}</p>
-      <p>地址：{{ carport.place }}</p>
+      <p>ID：{{ car.id }}</p>
+      <p>车牌号：{{ car.cname }}</p>
       <div class="modal-com-name">
-        {{ carport.pname }}
+        {{ car.cname }}
       </div>
     </div>
     <div class="modal-com-form">
       <a-range-picker
         dropdownClassName="hied-ant-picker-time-panel-cell-disabled"
-        v-show="selectCarport.id"
+        v-show="selectCar.id"
         :placeholder="['开始时间', '结束时间']"
         :showTime="{
           defaultValue: [
@@ -34,8 +33,8 @@
             dayjs(dayjs().endOf('day'), 'mm:ss'),
           ],
         }"
-        :disabledDate="rentDisableDate"
-        :disabledTime="rentDisabledRangeTime"
+        :disabledDate="seekDisableDate"
+        :disabledTime="seekDisabledRangeTime"
         showToday
         @ok="onRangeOk"
       />
@@ -46,12 +45,12 @@
 <script>
 import { ref } from "vue";
 import dayjs from "dayjs";
-import { useRentCarport } from "@/hooks/useRentCarport";
+import { useSeekCarport } from "@/hooks/useSeekCarport";
 import { computeDisabledTime } from "@/utils/computeDisabledTime";
-import { rentCarportApi } from "@/api/carport";
+import { seekCarportApi } from "@/api/car";
 
 export default {
-  name: "rentModal",
+  name: "seekModal",
   props: {
     visible: {
       type: Boolean,
@@ -61,32 +60,32 @@ export default {
       type: Function,
       default: () => {},
     },
-    userCarportList: {
+    userCarList: {
       type: Array,
       default: () => [],
     },
   },
   setup(props) {
-    // 共享车位时间
-    const rentTime = ref({ startTime: "", endTime: "" });
+    // 寻找车位时间
+    const seekTime = ref({ startTime: "", endTime: "" });
     // 最大可选结束时间
     let maxSelectEndDate = null;
-    // 共享车位禁用日期
-    const rentDisableDate = (current) => {
+    // 寻找车位禁用日期
+    const seekDisableDate = (current) => {
       return (
         current &&
         (current < dayjs().startOf("day") ||
           (maxSelectEndDate && current > dayjs(maxSelectEndDate).add(1, "day")))
       );
     };
-    // 查询车位被被共享的时间
-    const { rentCarportList, getData: getRentCarportList } = useRentCarport();
+    // 查询车辆被使用共享车位的时间
+    const { seekCarportList, getData: getSeekCarportList } = useSeekCarport();
     // 当前选择的开始时间
     let currentStartDate = dayjs();
-    // 共享车位禁用时间
-    const rentDisabledRangeTime = (current, type) => {
+    // 寻找车辆禁用时间
+    const seekDisabledRangeTime = (current, type) => {
       const { startDate, maxEndDate, disabled } = computeDisabledTime(
-        rentCarportList.value,
+        seekCarportList.value,
         current,
         type,
         currentStartDate
@@ -97,25 +96,24 @@ export default {
       maxSelectEndDate = maxEndDate;
       return current && disabled;
     };
-    // 共享车位日期选择确定回调
+    // 寻找车位日期选择确定回调
     const onRangeOk = (value) => {
-      rentTime.value.startTime = value[0]?.format("YYYY-MM-DD HH:mm:ss");
-      rentTime.value.endTime = value[1]?.format("YYYY-MM-DD HH:mm:ss");
+      seekTime.value.startTime = value[0]?.format("YYYY-MM-DD HH:mm:ss");
+      seekTime.value.endTime = value[1]?.format("YYYY-MM-DD HH:mm:ss");
     };
-    // 点击出租车位共享弹框的确定按钮的回调事件
-    const handleOkRent = () => {
+    // 点击寻找车位共享弹框的确定按钮的回调事件
+    const handleOkSeek = () => {
       // 查询车位已被共享时间
-      rentCarportApi({
-        starttime: rentTime.value.startTime,
-        endtime: rentTime.value.endTime,
-        comid: selectCarport.value.comid,
-        pid: selectCarport.value.id,
+      seekCarportApi({
+        starttime: seekTime.value.startTime,
+        endtime: seekTime.value.endTime,
+        cid: selectCar.value.id,
       }).then((result) => {
         console.log(result);
         if (result.status === 200) {
           // 清空选中的时间
-          rentTime.value.startTime = "";
-          rentTime.value.endTime = "";
+          seekTime.value.startTime = "";
+          seekTime.value.endTime = "";
           // 关闭弹框
           props.toggleVisible(false);
         }
@@ -124,40 +122,40 @@ export default {
     // 关闭弹框
     const handleCancel = () => {
       // 清空选中的时间
-      rentTime.value.startTime = "";
-      rentTime.value.endTime = "";
+      seekTime.value.startTime = "";
+      seekTime.value.endTime = "";
       // 关闭弹框
       props.toggleVisible(false);
     };
     // 选中的车位
-    const selectCarport = ref({});
+    const selectCar = ref({});
     // 选中车位
-    const selectCarportList = (carport) => {
+    const selectUserCarList = (car) => {
       // 如果当前选中的车位和上次选中的车位一样
-      if (carport.id === selectCarport.value.id) {
+      if (car.id === selectCar.value.id) {
         // 就取消选中
-        selectCarport.value = {};
+        selectCar.value = {};
       } else {
         // 清空选中的时间
-        rentTime.value.startTime = "";
-        rentTime.value.endTime = "";
-        // 如果当前车位未被选中并且车位不处于禁用状态则选中
-        selectCarport.value = carport;
+        seekTime.value.startTime = "";
+        seekTime.value.endTime = "";
+        // 如果当前车位未被选中则选中
+        selectCar.value = car;
         // 获取车位被共享的时间
-        getRentCarportList({ pid: carport.id });
+        getSeekCarportList({ cid: car.id });
       }
     };
 
     return {
       dayjs,
-      rentTime,
-      rentDisableDate,
-      rentDisabledRangeTime,
+      seekTime,
+      seekDisableDate,
+      seekDisabledRangeTime,
       onRangeOk,
-      handleOkRent,
+      handleOkSeek,
       handleCancel,
-      selectCarport,
-      selectCarportList,
+      selectCar,
+      selectUserCarList,
     };
   },
 };
