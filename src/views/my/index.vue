@@ -35,7 +35,7 @@
             </span>
           </div>
         </div>
-        <div class="my-left-carport-add" @click="isShowCarportForm = true">
+        <div class="my-left-carport-add" @click="changeCarportForm">
           <span class="horizontal"></span>
           <span class="vertical"></span>
         </div>
@@ -46,6 +46,10 @@
     </div>
     <!--  用户车位车辆添加表单  -->
     <div class="my-center-operation">
+      <a-empty
+        description="可以点击加号添加车位或车辆哦"
+        v-show="!isShowCarportForm && !isShowCarForm"
+      />
       <!--  用户添加车位表单  -->
       <a-form
         name="carport-form"
@@ -141,12 +145,33 @@
           </a-list>
         </a-form-item>
       </a-form>
-      <a-empty
-        description="可以点击加号添加车位或车辆哦"
-        v-show="!isShowCarportForm"
-      />
       <!--  用户添加车辆表单  -->
-      <a-form></a-form>
+      <a-form
+        name="car-form"
+        :rules="carFormRules"
+        :model="carFormState"
+        v-show="isShowCarForm"
+        @finish="carFormFinish"
+      >
+        <a-form-item label="车牌号" name="cname">
+          <a-input v-model:value="carFormState.cname" />
+        </a-form-item>
+        <a-form-item label="车颜色" name="color">
+          <!--          <a-input v-model:value="carFormState.color" />-->
+          <div class="car-form-color">
+            <span v-for="c in carColorList" :key="c.id">
+              <i
+                :style="{ backgroundColor: c.color }"
+                :class="{ active: c.color === currentCarColor }"
+                @click="carColorSelected(c.color)"
+              ></i>
+            </span>
+          </div>
+        </a-form-item>
+        <a-form-item :wrapper-col="{ offset: 4 }">
+          <a-button type="primary" html-type="submit">Submit</a-button>
+        </a-form-item>
+      </a-form>
     </div>
     <!--  用户车辆信息   -->
     <div class="my-right-car">
@@ -170,18 +195,12 @@
           </h3>
           <div class="car-info">
             <span>
-              当前状态：{{ car.state === null ? "没有车位" : "有车位" }}
+              当前状态：{{ car.pid === null ? "没有车位" : "有车位" }}
             </span>
             <span v-if="car.pname !== null">所在车位编号：{{ car.pname }}</span>
           </div>
-          <!--          <div class="carport-place">-->
-          <!--            <span>-->
-          <!--              位置：{{ carport.province }}{{ carport.city }}{{ carport.area }}-->
-          <!--              <span class="definite">{{ carport.place }}</span>-->
-          <!--            </span>-->
-          <!--          </div>-->
         </div>
-        <div class="my-right-car-add">
+        <div class="my-right-car-add" @click="changeCarForm">
           <span class="horizontal"></span>
           <span class="vertical"></span>
         </div>
@@ -201,6 +220,7 @@ import { useCarList } from "@/hooks/useCarList";
 import { getCommunityList } from "@/api";
 import { userBindCarportApi } from "@/api/carport";
 import { message } from "ant-design-vue";
+import { checkCarName } from "@/utils/validator";
 
 export default {
   name: "My",
@@ -211,7 +231,7 @@ export default {
     const { carportList, getData: getCarportData } = useCarportList();
     getCarportData({ uid: userInfo.value.id });
     const carValue = ref("car");
-    // 关于用户车辆信息列表
+    // 关于用户车辆信息列表(用户车辆)
     const { carList, getData: getCarData } = useCarList();
     getCarData({ uid: userInfo.value.id });
     // 关于用户车位表单数据
@@ -292,6 +312,54 @@ export default {
     };
     // 控制用户添加车位表单的显示与隐藏
     const isShowCarportForm = ref(false);
+    const changeCarportForm = () => {
+      isShowCarportForm.value = true;
+      isShowCarForm.value = false;
+    };
+    // 给定车的颜色
+    const carColorList = ref([
+      { id: 1, color: "#b7ef72" },
+      { id: 2, color: "#ae7ab3" },
+      { id: 3, color: "#825fe5" },
+      { id: 4, color: "#e2b991" },
+      { id: 5, color: "#5ec5e2" },
+      { id: 6, color: "#a28082" },
+      { id: 7, color: "#5cbca9" },
+      { id: 8, color: "#1b76fa" },
+      { id: 9, color: "#eda530" },
+      { id: 10, color: "#fa904d" },
+      { id: 11, color: "#f50" },
+      { id: 12, color: "#fff" },
+    ]);
+    // 关于用户车辆表单数据
+    const carFormState = ref({
+      // 车牌号
+      cname: "",
+      // 车颜色
+      color: "",
+    });
+    // 关于用户车辆表单校验规则
+    const carFormRules = {
+      cname: [{ required: true, validator: checkCarName, trigger: "change" }],
+      color: [{ required: true, message: "请选择您的车颜色！" }],
+    };
+    // 用于存储当前用户车辆颜色
+    const currentCarColor = ref("");
+    // 点击用户车辆颜色项的回调
+    const carColorSelected = (color) => {
+      currentCarColor.value = color;
+      console.log(currentCarColor.value);
+    };
+    // 控制用户添加车辆表单的显示与隐藏
+    const isShowCarForm = ref(false);
+    const changeCarForm = () => {
+      isShowCarForm.value = true;
+      isShowCarportForm.value = false;
+    };
+    // 提交用户添加车辆表单且数据验证成功后回调事件
+    const carFormFinish = (values) => {
+      console.log(values);
+    };
 
     return {
       userInfo,
@@ -309,6 +377,15 @@ export default {
       onCancelSelectedCarport,
       carportBindUser,
       isShowCarportForm,
+      changeCarportForm,
+      carFormState,
+      carFormRules,
+      carColorList,
+      changeCarForm,
+      isShowCarForm,
+      carColorSelected,
+      currentCarColor,
+      carFormFinish,
     };
   },
 };
@@ -316,6 +393,12 @@ export default {
 
 <style scoped lang="less">
 .my {
+  ::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    /*高宽分别对应横竖滚动条的尺寸*/
+    width: 0;
+    /* height: 4px; */
+  }
   height: 100%;
   display: flex;
   .my-left-carport,
@@ -415,11 +498,36 @@ export default {
   }
   .my-center-operation {
     width: 40%;
-    //background-color: #adff2f59;
+    margin: 30px 0;
+    border-radius: 30px;
+    border: 3px solid #ffd591;
     padding: 30px 30px 0;
+    :deep(.ant-empty) {
+      margin: 122px 8px 0;
+    }
+    .car-form-color {
+      display: flex;
+      flex-wrap: wrap;
+      span {
+        width: 25%;
+        height: 70px;
+        display: flex;
+        justify-content: space-around;
+        i {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: 1px solid #ccc;
+          &.active {
+            box-shadow: 0 0 10px #40a9ff;
+          }
+        }
+      }
+    }
     .carport-form-list {
       .carport-form-list-item {
         cursor: pointer;
+        background-color: #fff;
         &:hover {
           border-color: #d46b08;
         }
@@ -436,7 +544,7 @@ export default {
       }
       :deep(.ant-list-items) {
         overflow-y: auto;
-        height: 780px;
+        height: 720px;
       }
       :deep(.ant-ribbon-wrapper) {
         width: calc(100% - 8px);

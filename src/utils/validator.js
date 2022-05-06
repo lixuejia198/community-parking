@@ -23,3 +23,18 @@ export let checkPassword = async (_rules, value) => {
     return Promise.reject("密码长度在6到11之间");
   }
 };
+// 验证车牌号
+export let checkCarName = async (_rules, value) => {
+  let result = false;
+  // 如果用户没有输入车牌号 给出提示让用户输入自己的车牌号
+  if (!value) {
+    return Promise.reject("请输入您的车牌号！");
+  }
+  // 判断用户输入的车牌号格式是否正确
+  if (value.length === 7) {
+    let express =
+      /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领]{1}[A-Z]{1}[A-Z0-9]{4}[A-Z0-9挂学警港澳]{1}$/;
+    result = express.test(value);
+  }
+  return result ? true : Promise.reject("车牌号格式不正确！！！");
+};
