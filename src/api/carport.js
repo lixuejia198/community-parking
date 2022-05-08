@@ -12,12 +12,11 @@ export function getCarport({ uid, comid }) {
 
 /**
  * 查询车位被被共享的时间
- * @param pid
- * @param time
+ * @param pid 车位ID
  * @returns {Promise}
  */
-export function getCarportRentTime({ pid, time }) {
-  return requestWithToken("/carport/rent_time", "get", { pid, time });
+export function getCarportRentTime({ pid }) {
+  return requestWithToken("/carport/rent_time", "get", { pid });
 }
 
 /**
