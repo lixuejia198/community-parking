@@ -17,7 +17,8 @@ export function useCarList() {
       carList.value = data.data;
       return data.data;
     }
-    return data.data;
+    carList.value = [];
+    return [];
   };
 
   return {

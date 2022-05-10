@@ -169,7 +169,7 @@
           </div>
         </a-form-item>
         <a-form-item :wrapper-col="{ offset: 4 }">
-          <a-button type="primary" html-type="submit">Submit</a-button>
+          <a-button type="primary" html-type="submit">添加车辆</a-button>
         </a-form-item>
       </a-form>
     </div>
@@ -221,6 +221,7 @@ import { getCommunityList } from "@/api";
 import { userBindCarportApi } from "@/api/carport";
 import { message } from "ant-design-vue";
 import { checkCarName } from "@/utils/validator";
+import { addCarByUserIDApi } from "@/api/car";
 
 export default {
   name: "My",
@@ -347,8 +348,10 @@ export default {
     const currentCarColor = ref("");
     // 点击用户车辆颜色项的回调
     const carColorSelected = (color) => {
+      carFormState.value.color = color;
       currentCarColor.value = color;
       console.log(currentCarColor.value);
+      console.log(carFormState.value, "carFormState");
     };
     // 控制用户添加车辆表单的显示与隐藏
     const isShowCarForm = ref(false);
@@ -359,6 +362,25 @@ export default {
     // 提交用户添加车辆表单且数据验证成功后回调事件
     const carFormFinish = (values) => {
       console.log(values);
+      addCarByUserIDApi({
+        uid: userInfo.value.id,
+        cname: values.cname,
+        color: values.color,
+      }).then((data) => {
+        if (data.status === 200) {
+          // 提示信息
+          message.success(data.msg);
+          // 清空表单内容
+          carFormState.value = { cname: "", color: "" };
+          // 取消当前车颜色项的选中
+          currentCarColor.value = "";
+          // 刷新用户车辆列表
+          getCarData({ uid: userInfo.value.id });
+        }
+        if (data.status === 0) {
+          message.success(data.msg);
+        }
+      });
     };
 
     return {
@@ -396,8 +418,14 @@ export default {
   ::-webkit-scrollbar {
     /*滚动条整体样式*/
     /*高宽分别对应横竖滚动条的尺寸*/
-    width: 0;
+    width: 7px;
     /* height: 4px; */
+  }
+  ::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    border-radius: 5px;
+    -webkit-box-shadow: inset 0 0 5px rgba(212, 107, 8, 0.7);
+    background: rgba(212, 107, 8, 0.2);
   }
   height: 100%;
   display: flex;

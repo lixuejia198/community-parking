@@ -32,3 +32,14 @@ export function seekCarportApi({ starttime, endtime, cid }) {
     cid,
   });
 }
+
+/**
+ * 添加车辆
+ * @param uid 用户id
+ * @param cname 车牌号
+ * @param color 车颜色
+ * @returns {Promise}
+ */
+export function addCarByUserIDApi({ uid, cname, color }) {
+  return requestWithToken("/car/add", "post", { uid, cname, color });
+}
