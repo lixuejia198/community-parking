@@ -11,7 +11,7 @@
         <a-radio-button value="carport" @click="carportValue = 'carport'">
           我的车位
         </a-radio-button>
-        <a-radio-button value="history" @click="carportValue = 'history'">
+        <a-radio-button value="history" @click="getCarportLogByUid">
           历史记录
         </a-radio-button>
       </a-radio-group>
@@ -41,7 +41,13 @@
         </div>
       </div>
       <div class="my-left-carport-history" v-show="carportValue === 'history'">
-        历史记录
+        <div class="my-left-carport-history-content">
+          <rent-item
+            v-for="carportLog in carportLogData"
+            :key="carportLog.id"
+            :rent="carportLog"
+          />
+        </div>
       </div>
     </div>
     <!--  用户车位车辆添加表单  -->
@@ -173,7 +179,7 @@
         </a-form-item>
       </a-form>
     </div>
-    <!--  用户车辆信息   -->
+    <!--  用户车辆信息  -->
     <div class="my-right-car">
       <a-radio-group
         v-model:value="carValue"
@@ -184,7 +190,7 @@
         <a-radio-button value="car" @click="carValue = 'car'">
           我的车辆
         </a-radio-button>
-        <a-radio-button value="history" @click="carValue = 'history'">
+        <a-radio-button value="history" @click="getCarLogByUid">
           历史记录
         </a-radio-button>
       </a-radio-group>
@@ -206,7 +212,13 @@
         </div>
       </div>
       <div class="my-right-car-history" v-show="carValue === 'history'">
-        历史记录
+        <div class="my-right-car-history-content">
+          <seek-item
+            v-for="carLog in carLogData"
+            :key="carLog.id"
+            :seek="carLog"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -218,19 +230,24 @@ import { computed, ref } from "vue";
 import { getUserInfo } from "@/utils/getUserInfo";
 import { useCarList } from "@/hooks/useCarList";
 import { getCommunityList } from "@/api";
-import { userBindCarportApi } from "@/api/carport";
+import { userBindCarportApi, getCarportLogApi } from "@/api/carport";
 import { message } from "ant-design-vue";
 import { checkCarName } from "@/utils/validator";
-import { addCarByUserIDApi } from "@/api/car";
+import { addCarByUserIDApi, getCarLogApi } from "@/api/car";
+import SeekItem from "@/views/community/components/seekItem";
+import RentItem from "@/views/community/components/rentItem";
 
 export default {
   name: "My",
+  components: { RentItem, SeekItem },
   setup() {
     const userInfo = ref(getUserInfo());
+    // 控制车位列表与车位日志切换
     const carportValue = ref("carport");
     // 关于用户车位信息列表(用户车位)
     const { carportList, getData: getCarportData } = useCarportList();
     getCarportData({ uid: userInfo.value.id });
+    // 控制车辆列表与车辆日志切换
     const carValue = ref("car");
     // 关于用户车辆信息列表(用户车辆)
     const { carList, getData: getCarData } = useCarList();
@@ -350,8 +367,8 @@ export default {
     const carColorSelected = (color) => {
       carFormState.value.color = color;
       currentCarColor.value = color;
-      console.log(currentCarColor.value);
-      console.log(carFormState.value, "carFormState");
+      // console.log(currentCarColor.value);
+      // console.log(carFormState.value, "carFormState");
     };
     // 控制用户添加车辆表单的显示与隐藏
     const isShowCarForm = ref(false);
@@ -361,7 +378,7 @@ export default {
     };
     // 提交用户添加车辆表单且数据验证成功后回调事件
     const carFormFinish = (values) => {
-      console.log(values);
+      // console.log(values);
       addCarByUserIDApi({
         uid: userInfo.value.id,
         cname: values.cname,
@@ -379,6 +396,30 @@ export default {
         }
         if (data.status === 0) {
           message.success(data.msg);
+        }
+      });
+    };
+    // 用于存储车辆日志数据
+    const carLogData = ref([]);
+    // 点击车辆历史记录 查询车辆日志
+    const getCarLogByUid = () => {
+      carValue.value = "history";
+      getCarLogApi({ uid: userInfo.value.id }).then((data) => {
+        console.log(data);
+        if (data.status === 200) {
+          carLogData.value = data.data;
+        }
+      });
+    };
+    // 用于存储车位日志数据
+    const carportLogData = ref([]);
+    // 点击车位历史记录 查询车位日志
+    const getCarportLogByUid = () => {
+      carportValue.value = "history";
+      getCarportLogApi({ uid: userInfo.value.id }).then((data) => {
+        console.log(data);
+        if (data.status === 200) {
+          carportLogData.value = data.data;
         }
       });
     };
@@ -408,6 +449,10 @@ export default {
       carColorSelected,
       currentCarColor,
       carFormFinish,
+      getCarLogByUid,
+      carLogData,
+      getCarportLogByUid,
+      carportLogData,
     };
   },
 };
@@ -521,7 +566,16 @@ export default {
     }
     .my-left-carport-history,
     .my-right-car-history {
-      padding-top: 10%;
+      margin-top: 50px;
+      height: 100%;
+      .my-right-car-history-content,
+      .my-left-carport-history-content {
+        padding: 10px;
+        background-color: #edf2f7;
+        height: calc(100% - 50px);
+        // 超出范围垂直显示滚动条(auto是溢出才显示滚动条)
+        overflow-y: auto;
+      }
     }
   }
   .my-center-operation {

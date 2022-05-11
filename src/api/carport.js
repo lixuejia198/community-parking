@@ -45,3 +45,20 @@ export function rentCarportApi({ starttime, endtime, comid, pid }) {
 export function userBindCarportApi({ pid, uid }) {
   return requestWithToken("/carport/bind_user", "post", { pid, uid });
 }
+
+/**
+ * 查询车位日志
+ * @param uid 用户id
+ * @param pid 车位id
+ * @param page_num 页码
+ * @param page_size 每页数量
+ * @returns {Promise}
+ */
+export function getCarportLogApi({ uid, pid, page_num, page_size }) {
+  return requestWithToken("/carport/log", "get", {
+    uid,
+    pid,
+    page_num,
+    page_size,
+  });
+}
