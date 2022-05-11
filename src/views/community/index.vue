@@ -16,8 +16,13 @@
           </template>
           <template v-slot:item>
             <rent-item v-for="rent in rentList" :key="rent.id" :rent="rent">
-              <template v-slot:itemButton>
-                <span class="rentlist-item-button">我想使用</span>
+              <template v-slot:itemButton v-if="!rent.cid">
+                <div
+                  class="rentlist-item-button"
+                  @click="handleSeekCarport(rent)"
+                >
+                  我想使用此车位
+                </div>
               </template>
             </rent-item>
           </template>
@@ -68,6 +73,13 @@
     :toggleVisible="toggleSeekModalVisible"
     :userCarList="userCarList"
   />
+  <!-- 使用共享车位弹框 -->
+  <seek-item-modal
+    :visible="seekItemVisible"
+    :toggleVisible="toggleSeekItemModalVisible"
+    :userCarList="userCarList"
+    :currentCarport="currentItemCarport"
+  />
 </template>
 
 <script>
@@ -91,10 +103,12 @@ import { useCarList } from "@/hooks/useCarList";
 import { useCarportList } from "@/hooks/useCarportList";
 import RentModal from "@/views/community/components/rentModal";
 import SeekModal from "@/views/community/components/seekModal";
+import SeekItemModal from "@/views/community/components/seekItemModal";
 
 export default {
   name: "Community",
   components: {
+    SeekItemModal,
     RentModal,
     SeekModal,
     TopNav,
@@ -159,7 +173,7 @@ export default {
       }
     };
 
-    // 控制寻找弹框的显示与隐藏
+    // 寻找车位弹框的显示状态
     const seekVisible = ref(false);
     // 修改共享车位弹框的显示与隐藏
     const toggleSeekModalVisible = (state) => {
@@ -173,21 +187,20 @@ export default {
       seekVisible.value = true;
     };
 
-    // 选中的车
-    const selectCarInfo = ref({});
-    // 选中需要车位的车
-    const selectUserCarList = (carInfo) => {
-      // 如果当前选中的车和上次选中的车一样
-      if (carInfo.id === selectCarInfo.value.id) {
-        // 就取消选中
-        selectCarInfo.value = {};
-      } else if (
-        // 如果当前车未被选中并且不处于禁用状态则选中
-        carInfo.id !== selectCarInfo.value.id &&
-        carInfo.pid === null
-      ) {
-        selectCarInfo.value = carInfo;
-      }
+    // 使用共享车位弹框显示状态
+    const seekItemVisible = ref(false);
+    // 修改共享车位弹框的显示与隐藏
+    const toggleSeekItemModalVisible = (state) => {
+      seekItemVisible.value = state ? state : !seekItemVisible.value;
+    };
+    // 当前车位信息
+    const currentItemCarport = ref({});
+    // 点击共享车位列表中的某一项 显示车位信息弹框
+    const handleSeekCarport = (carport) => {
+      console.log("carport", carport);
+      currentItemCarport.value = carport;
+      getCarData({ uid: userInfo.value.id });
+      seekItemVisible.value = true;
     };
 
     // 获取车位数据
@@ -272,13 +285,15 @@ export default {
       threeRef,
       seekCarport,
       userCarList,
-      selectCarInfo,
-      selectUserCarList,
       dayjs,
       rentVisible,
       toggleRentModalVisible,
       seekVisible,
       toggleSeekModalVisible,
+      seekItemVisible,
+      toggleSeekItemModalVisible,
+      currentItemCarport,
+      handleSeekCarport,
     };
   },
 };
@@ -320,11 +335,14 @@ export default {
         cursor: pointer;
       }
       .rentlist-item-button {
+        width: 100%;
+        border-radius: 8px;
         font-size: 14px;
         padding: 8px;
         background-color: rgba(255, 115, 0, 1);
         color: white;
         cursor: pointer;
+        background-image: linear-gradient(to right, #ff7300, #fff7e6);
       }
     }
     .community-right {

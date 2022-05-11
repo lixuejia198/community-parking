@@ -45,3 +45,13 @@ export function rentCarportApi({ starttime, endtime, comid, pid }) {
 export function userBindCarportApi({ pid, uid }) {
   return requestWithToken("/carport/bind_user", "post", { pid, uid });
 }
+
+/**
+ * 使用车位
+ * @param id 车位共享id
+ * @param cid 车辆id
+ * @returns {Promise}
+ */
+export function useCarportApi({ id, cid }) {
+  return requestWithToken("/carport/use", "post", { id, cid });
+}
