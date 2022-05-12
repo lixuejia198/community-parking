@@ -93,9 +93,9 @@ export default {
     const router = useRouter();
     // 轮播图数据
     const banners = [
-      { id: 1, imgUrl: "/images/carousel_01.webp" },
-      { id: 2, imgUrl: "/images/carousel_02.webp" },
-      { id: 3, imgUrl: "/images/carousel_03.webp" },
+      { id: 1, imgUrl: "/images/carousel_01.jpg" },
+      { id: 2, imgUrl: "/images/carousel_02.jpg" },
+      { id: 3, imgUrl: "/images/carousel_03.jpg" },
     ];
     // 获取出租车位列表数据
     const { rentList } = useRentList({ pageSize: 20 });
