@@ -66,3 +66,20 @@ export function useCarportApi({ id, cid }) {
 export function shareCarportApi({ id, comid, pid }) {
   return requestWithToken("/carport/share", "post", { id, comid, pid });
 }
+
+/**
+ * 查询车位日志
+ * @param uid 用户id
+ * @param pid 车位id
+ * @param page_num 页码
+ * @param page_size 每页数量
+ * @returns {Promise}
+ */
+export function getCarportLogApi({ uid, pid, page_num, page_size }) {
+  return requestWithToken("/carport/log", "get", {
+    uid,
+    pid,
+    page_num,
+    page_size,
+  });
+}

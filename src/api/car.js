@@ -32,3 +32,26 @@ export function seekCarportApi({ starttime, endtime, cid }) {
     cid,
   });
 }
+
+/**
+ * 添加车辆
+ * @param uid 用户id
+ * @param cname 车牌号
+ * @param color 车颜色
+ * @returns {Promise}
+ */
+export function addCarByUserIDApi({ uid, cname, color }) {
+  return requestWithToken("/car/add", "post", { uid, cname, color });
+}
+
+/**
+ * 查询车辆日志
+ * @param uid 用户id
+ * @param cid 车辆id
+ * @param page_num 页码
+ * @param page_size 每页数量
+ * @returns {Promise}
+ */
+export function getCarLogApi({ uid, cid, page_num, page_size }) {
+  return requestWithToken("/car/log", "get", { uid, cid, page_num, page_size });
+}
