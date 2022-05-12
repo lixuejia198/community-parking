@@ -1,41 +1,43 @@
 <template>
   <a-modal
     :visible="visible"
-    title="请选择你所需要车位的车"
+    title="请选择你要共享的车位"
     cancelText="取消"
     okText="确定"
-    @ok="handleOkSeek"
+    @ok="handleOkRent"
     @cancel="handleCancel"
   >
     <div
-      v-for="car in userCarList"
-      :key="car.id"
+      v-for="carport in userCarportList"
+      :key="carport.id"
       class="modal-com-item"
       :class="{
-        active: selectCar.id === car.id,
-        disabled: car.starttime && car.endtime ? isCarportDisabled(car) : false,
+        active: selectCarport.id === carport.id,
+        disabled:
+          carport.starttime && carport.endtime ? isCarDisabled(carport) : false,
       }"
       @mouseenter="(e) => e.target.classList.add('hover')"
       @mouseleave="(e) => e.target.classList.remove('hover')"
-      @click="selectUserCar(car)"
+      @click="selectUserCarport(carport)"
     >
-      <p>ID：{{ car.id }}</p>
-      <p>车牌号：{{ car.cname }}</p>
+      <p>ID：{{ carport.id }}</p>
+      <p>小区：{{ carport.comname }}</p>
+      <p>地址：{{ carport.place }}</p>
       <div class="modal-com-name">
-        {{ car.cname }}
+        {{ carport.pname }}
       </div>
     </div>
   </a-modal>
 </template>
 
 <script>
-import { ref } from "vue";
 import dayjs from "dayjs";
-import { useCarportApi } from "@/api/carport";
+import { ref } from "vue";
+import { shareCarportApi } from "@/api/carport";
 import { message } from "ant-design-vue";
 
 export default {
-  name: "seekItemModal",
+  name: "rentItemModal",
   props: {
     visible: {
       type: Boolean,
@@ -45,46 +47,45 @@ export default {
       type: Function,
       default: () => {},
     },
-    userCarList: {
+    userCarportList: {
       type: Array,
       default: () => [],
     },
-    currentCarport: {
+    currentCar: {
       type: Object,
       default: () => {},
     },
   },
   setup(props) {
-    // 选中的车辆
-    const selectCar = ref({});
+    // 选中的车位
+    const selectCarport = ref({});
     // 选中车辆
-    const selectUserCar = (car) => {
-      // 判断当前选中的车辆是否与上次选中的车位相同
-      if (selectCar.value.id === car.id) {
-        // 就取消选中
-        selectCar.value = {};
-      } else if (!isCarportDisabled(car)) {
-        // 如果当前车位未被选中则选中
-        selectCar.value = car;
+    const selectUserCarport = (carport) => {
+      // 判断当前选中的车位是否与上次选中的相同
+      if (selectCarport.value.id === carport.id) {
+        selectCarport.value = {};
+      } else if (!isCarDisabled(carport)) {
+        selectCarport.value = carport;
       }
     };
-    // 判断车位是否禁用
-    const isCarportDisabled = (car) => {
+    // 判断车辆是否禁用
+    const isCarDisabled = (carport) => {
       return (
-        (dayjs(car.starttime) >= dayjs(props.currentCarport.starttime) &&
-          dayjs(car.starttime) <= dayjs(props.currentCarport.endtime)) ||
-        (dayjs(car.endtime) >= dayjs(props.currentCarport.starttime) &&
-          dayjs(car.endtime) <= dayjs(props.currentCarport.endtime)) ||
-        (dayjs(car.starttime) <= dayjs(props.currentCarport.starttime) &&
-          dayjs(car.endtime) >= dayjs(props.currentCarport.endtime))
+        (dayjs(carport.starttime) >= dayjs(props.currentCar.starttime) &&
+          dayjs(carport.starttime) <= dayjs(props.currentCar.endtime)) ||
+        (dayjs(carport.endtime) >= dayjs(props.currentCar.starttime) &&
+          dayjs(carport.endtime) <= dayjs(props.currentCar.endtime)) ||
+        (dayjs(carport.starttime) <= dayjs(props.currentCar.starttime) &&
+          dayjs(carport.endtime) >= dayjs(props.currentCar.endtime))
       );
     };
 
     // 点击弹框的确定按钮的回调事件
-    const handleOkSeek = () => {
-      useCarportApi({
-        id: props.currentCarport.id,
-        cid: selectCar.value.id,
+    const handleOkRent = () => {
+      shareCarportApi({
+        id: props.currentCar.id,
+        comid: selectCarport.value.comid,
+        pid: selectCarport.value.id,
       }).then((result) => {
         if (result.status === 200) {
           props.toggleVisible(false);
@@ -101,11 +102,10 @@ export default {
     };
 
     return {
-      dayjs,
-      selectCar,
-      selectUserCar,
-      isCarportDisabled,
-      handleOkSeek,
+      selectCarport,
+      selectUserCarport,
+      isCarDisabled,
+      handleOkRent,
       handleCancel,
     };
   },

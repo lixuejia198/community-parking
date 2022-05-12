@@ -55,3 +55,14 @@ export function userBindCarportApi({ pid, uid }) {
 export function useCarportApi({ id, cid }) {
   return requestWithToken("/carport/use", "post", { id, cid });
 }
+
+/**
+ * 共享车位给车辆
+ * @param id 寻找车位id
+ * @param comid 小区id
+ * @param pid 车位id
+ * @returns {Promise}
+ */
+export function shareCarportApi({ id, comid, pid }) {
+  return requestWithToken("/carport/share", "post", { id, comid, pid });
+}

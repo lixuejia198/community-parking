@@ -46,7 +46,9 @@
           <template v-slot:item>
             <seek-item v-for="seek in seekList" :key="seek.id" :seek="seek">
               <template v-slot:itemButton>
-                <span class="seeklist-item-button">我要共享</span>
+                <span class="seeklist-item-button" @click="handleRentCar(seek)"
+                  >我要共享</span
+                >
               </template>
             </seek-item>
           </template>
@@ -80,6 +82,13 @@
     :userCarList="userCarList"
     :currentCarport="currentItemCarport"
   />
+  <!-- 共享寻找车位弹框 -->
+  <rent-item-modal
+    :visible="rentItemVisible"
+    :toggleVisible="toggleRentItemModalVisible"
+    :userCarportList="userCarportList"
+    :currentCar="currentItemCar"
+  />
 </template>
 
 <script>
@@ -104,11 +113,13 @@ import { useCarportList } from "@/hooks/useCarportList";
 import RentModal from "@/views/community/components/rentModal";
 import SeekModal from "@/views/community/components/seekModal";
 import SeekItemModal from "@/views/community/components/seekItemModal";
+import RentItemModal from "@/views/community/components/rentItemModal";
 
 export default {
   name: "Community",
   components: {
     SeekItemModal,
+    RentItemModal,
     RentModal,
     SeekModal,
     TopNav,
@@ -189,18 +200,32 @@ export default {
 
     // 使用共享车位弹框显示状态
     const seekItemVisible = ref(false);
-    // 修改共享车位弹框的显示与隐藏
+    // 修改使用共享车位弹框的显示与隐藏
     const toggleSeekItemModalVisible = (state) => {
       seekItemVisible.value = state ? state : !seekItemVisible.value;
     };
     // 当前车位信息
     const currentItemCarport = ref({});
-    // 点击共享车位列表中的某一项 显示车位信息弹框
+    // 点击共享车位列表中的某一项 显示车辆信息弹框
     const handleSeekCarport = (carport) => {
-      console.log("carport", carport);
       currentItemCarport.value = carport;
       getCarData({ uid: userInfo.value.id });
       seekItemVisible.value = true;
+    };
+
+    // 共享寻找车位弹框显示状态
+    const rentItemVisible = ref(false);
+    // 修改共享寻找车位弹框显示与隐藏
+    const toggleRentItemModalVisible = (state) => {
+      rentItemVisible.value = state ? state : !rentItemVisible.value;
+    };
+    // 当前车辆信息
+    const currentItemCar = ref({});
+    // 点击寻找车位列表中的某一项 显示车位信息弹框
+    const handleRentCar = (car) => {
+      currentItemCar.value = car;
+      getCarportData({ uid: userInfo.value.id });
+      rentItemVisible.value = true;
     };
 
     // 获取车位数据
@@ -294,6 +319,10 @@ export default {
       toggleSeekItemModalVisible,
       currentItemCarport,
       handleSeekCarport,
+      rentItemVisible,
+      toggleRentItemModalVisible,
+      currentItemCar,
+      handleRentCar,
     };
   },
 };
