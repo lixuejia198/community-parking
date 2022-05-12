@@ -45,10 +45,10 @@
           </template>
           <template v-slot:item>
             <seek-item v-for="seek in seekList" :key="seek.id" :seek="seek">
-              <template v-slot:itemButton>
-                <span class="seeklist-item-button" @click="handleRentCar(seek)"
-                  >我要共享</span
-                >
+              <template v-slot:itemButton v-if="!seek.comid && !seek.pid">
+                <span class="seeklist-item-button" @click="handleRentCar(seek)">
+                  我要共享
+                </span>
               </template>
             </seek-item>
           </template>
