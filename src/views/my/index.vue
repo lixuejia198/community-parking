@@ -457,6 +457,7 @@ export default {
       carLogData,
       getCarportLogByUid,
       carportLogData,
+      carportListHeight: computed(() => window.innerHeight - 250),
     };
   },
 };
@@ -622,6 +623,7 @@ export default {
       }
     }
     .carport-form-list {
+      height: 100%;
       .carport-form-list-item {
         cursor: pointer;
         background-color: #fff;
@@ -641,7 +643,7 @@ export default {
       }
       :deep(.ant-list-items) {
         overflow-y: auto;
-        height: 720px;
+        height: calc(v-bind(carportListHeight) * 1px);
       }
       :deep(.ant-ribbon-wrapper) {
         width: calc(100% - 8px);
