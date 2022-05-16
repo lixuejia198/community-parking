@@ -63,7 +63,7 @@ export default {
     padding-left: 20px;
     cursor: pointer;
     img {
-      width: 55px;
+      width: 50px;
     }
     span {
       font-size: 16px;

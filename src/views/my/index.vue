@@ -52,10 +52,14 @@
     </div>
     <!--  用户车位车辆添加表单  -->
     <div class="my-center-operation">
-      <a-empty
-        description="可以点击加号添加车位或车辆哦"
-        v-show="!isShowCarportForm && !isShowCarForm"
-      />
+      <!--      <a-empty-->
+      <!--        description="可以点击加号添加车位或车辆哦"-->
+      <!--        v-show="!isShowCarportForm && !isShowCarForm"-->
+      <!--      />-->
+      <div class="empty" v-show="!isShowCarportForm && !isShowCarForm">
+        <img src="/images/box.png" alt="" />
+        <p>可以点击“ + ”添加车位或车辆哦</p>
+      </div>
       <!--  用户添加车位表单  -->
       <a-form
         name="carport-form"
@@ -460,6 +464,7 @@ export default {
 
 <style scoped lang="less">
 .my {
+  overflow: hidden;
   ::-webkit-scrollbar {
     /*滚动条整体样式*/
     /*高宽分别对应横竖滚动条的尺寸*/
@@ -586,6 +591,16 @@ export default {
     padding: 30px 30px 0;
     :deep(.ant-empty) {
       margin: 122px 8px 0;
+    }
+    .empty {
+      text-align: center;
+      padding-top: inherit;
+      img {
+        width: 256px;
+      }
+      p {
+        margin-top: 10px;
+      }
     }
     .car-form-color {
       display: flex;
