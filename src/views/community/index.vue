@@ -21,7 +21,7 @@
                   class="rentlist-item-button"
                   @click="handleSeekCarport(rent)"
                 >
-                  我想使用此车位
+                  使用此车位
                 </div>
               </template>
             </rent-item>
@@ -46,9 +46,9 @@
           <template v-slot:item>
             <seek-item v-for="seek in seekList" :key="seek.id" :seek="seek">
               <template v-slot:itemButton v-if="!seek.comid && !seek.pid">
-                <span class="seeklist-item-button" @click="handleRentCar(seek)">
-                  我要共享
-                </span>
+                <div class="seeklist-item-button" @click="handleRentCar(seek)">
+                  共享车位给TA
+                </div>
               </template>
             </seek-item>
           </template>
@@ -243,11 +243,6 @@ export default {
         if (item.direction) {
           // 设置车位方向
           carportGroup.rotateY(Math.PI / item.direction);
-          // 设置车位位置
-          // carportGroup.position.set(item.x * 500, item.y * 200, item.z * 200);
-        } else {
-          // 设置车位位置
-          // carportGroup.position.set(item.x * 200, item.y * 200, item.z * 500);
         }
         TE.addObject(carportGroup);
       });
@@ -398,11 +393,14 @@ export default {
         cursor: pointer;
       }
       .seeklist-item-button {
+        width: 100%;
+        border-radius: 8px;
         font-size: 14px;
         padding: 8px;
         background-color: rgba(255, 115, 0, 1);
         color: white;
         cursor: pointer;
+        background-image: linear-gradient(to right, #ff7300, #fff7e6);
       }
     }
   }
