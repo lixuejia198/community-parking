@@ -1,5 +1,5 @@
 <template>
-  <div class="xtx-carousel" @mouseenter="stopPlay" @mouseleave="startPlay">
+  <div class="carousel" @mouseenter="stopPlay" @mouseleave="startPlay">
     <ul class="carousel-body">
       <!-- 轮播图图片 -->
       <li
@@ -25,7 +25,7 @@
         v-for="(item, index) in carousels"
         :key="item.id"
         :class="{ active: index === currentIndex }"
-        @click="currentIndex = index"
+        @click="indicatorChange(index)"
       >
       </span>
     </div>
@@ -78,6 +78,13 @@ export default {
       // 传递轮播图图片链接给父组件
       context.emit("getImgUrl", props.carousels[currentIndex.value].imgUrl);
     };
+    // 点击小圆点回调事件
+    const indicatorChange = (index) => {
+      // 存储当前图片索引
+      currentIndex.value = index;
+      // 传递轮播图图片链接给父组件
+      context.emit("getImgUrl", props.carousels[currentIndex.value].imgUrl);
+    };
     // 用于存储定时器
     const timer = ref(null);
     // 开启自动轮播
@@ -97,12 +104,12 @@ export default {
     onMounted(startPlay);
     // 组件卸载之后停止自动轮播
     onUnmounted(stopPlay);
-    return { currentIndex, toggle, startPlay, stopPlay };
+    return { currentIndex, toggle, startPlay, stopPlay, indicatorChange };
   },
 };
 </script>
 <style scoped lang="less">
-.xtx-carousel {
+.carousel {
   width: 80%;
   height: 100%;
   min-width: 300px;

@@ -1,5 +1,5 @@
 <template>
-  <div class="xtx-pagination">
+  <div class="pagination">
     <!-- 如果当前页大于1 表示有上一页 渲染上一页数据 -->
     <a
       href="javascript:"
@@ -112,7 +112,7 @@ export default {
 </script>
 
 <style scoped lang="less">
-.xtx-pagination {
+.pagination {
   display: flex;
   justify-content: center;
   padding: 30px;
