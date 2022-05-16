@@ -20,7 +20,7 @@
         </span>
       </div>
     </div>
-    <div class="list-content-place">
+    <div class="list-content-place" v-if="rent.commname || rent.place">
       <span class="list-content-time-title"> 位置 </span>
       <span> {{ rent.comname }}({{ rent.place }}) </span>
     </div>
@@ -75,7 +75,7 @@ export default {
     border-radius: 10px;
     padding-left: 10px;
     background-image: linear-gradient(to right, #2db7f5, #fff);
-    margin-left: 4px;
+    margin: 4px 0 4px 4px;
   }
   .list-content-place {
     border-radius: 10px;
