@@ -571,7 +571,7 @@ export default {
       .my-right-car-history-content,
       .my-left-carport-history-content {
         padding: 10px;
-        background-color: #edf2f7;
+        // background-color: #edf2f7;
         height: calc(100% - 50px);
         // 超出范围垂直显示滚动条(auto是溢出才显示滚动条)
         overflow-y: auto;

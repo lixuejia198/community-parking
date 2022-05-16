@@ -55,7 +55,7 @@ export default {
     },
   },
   components: { LeftOutlined, RightOutlined },
-  setup(props) {
+  setup(props, context) {
     // 当前轮播图索引 默认显示第一张 小圆点也是默认第一个是亮的
     const currentIndex = ref(0);
     // 轮播图切换
@@ -75,6 +75,8 @@ export default {
         // 正常赋值
         currentIndex.value = nextIndex;
       }
+      // 传递轮播图图片链接给父组件
+      context.emit("getImgUrl", props.carousels[currentIndex.value].imgUrl);
     };
     // 用于存储定时器
     const timer = ref(null);
@@ -101,11 +103,12 @@ export default {
 </script>
 <style scoped lang="less">
 .xtx-carousel {
-  width: 60%;
+  width: 80%;
   height: 100%;
   min-width: 300px;
   min-height: 150px;
   position: relative;
+  margin: 0 10%;
   .carousel {
     &-body {
       width: 100%;

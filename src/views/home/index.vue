@@ -3,10 +3,26 @@
     <div class="container">
       <!--  用户登录信息  -->
       <TopNav />
-      <!--  轮播图和小区列表  -->
-      <div class="home-banner">
-        <!--  轮播图区域  -->
-        <Carousel :carousels="banners" :autoPlay="true" />
+    </div>
+    <!--  轮播图  -->
+    <div :style="{ overflow: 'hidden' }">
+      <div
+        class="home-banner"
+        :style="{ backgroundImage: `url(${currentBannerImgUrl})` }"
+      >
+        <div class="container">
+          <!--  轮播图区域  -->
+          <Carousel
+            :carousels="banners"
+            :autoPlay="true"
+            @getImgUrl="getBannerImgUrl"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <!--  出租车位和寻找车位列表展示(具体功能在小区模块实现)  -->
+      <div class="home-show">
         <!--  小区列表展示  -->
         <div class="home-community">
           <!--  级联选择框  -->
@@ -41,9 +57,6 @@
             </template>
           </a-table>
         </div>
-      </div>
-      <!--  出租车位和寻找车位列表展示(具体功能在小区模块实现)  -->
-      <div class="home-show">
         <!--  出租车位列表展示  -->
         <div class="home-show-rent">
           <rent-or-seek
@@ -93,9 +106,9 @@ export default {
     const router = useRouter();
     // 轮播图数据
     const banners = [
-      { id: 1, imgUrl: "/images/carousel_01.webp" },
-      { id: 2, imgUrl: "/images/carousel_02.webp" },
-      { id: 3, imgUrl: "/images/carousel_03.webp" },
+      { id: 1, imgUrl: "/images/carousel_01.jpg" },
+      { id: 2, imgUrl: "/images/carousel_02.jpg" },
+      { id: 3, imgUrl: "/images/carousel_03.jpg" },
     ];
     // 获取出租车位列表数据
     const { rentList } = useRentList({ pageSize: 20 });
@@ -178,6 +191,13 @@ export default {
       router.push(`/community?comid=${id}`);
     };
 
+    // 当前轮播图的图片链接
+    const currentBannerImgUrl = ref(banners[0].imgUrl);
+    // 获取当前轮播图图片链接的方法
+    const getBannerImgUrl = (imgUrl) => {
+      currentBannerImgUrl.value = imgUrl;
+    };
+
     return {
       banners,
       rentList,
@@ -189,47 +209,28 @@ export default {
       communityListColumns,
       onChange,
       goToCommunity,
+      currentBannerImgUrl,
+      getBannerImgUrl,
     };
   },
 };
 </script>
 <style scoped lang="less">
 .home {
-  height: 100%;
+  //height: 100%;
   .container {
     width: 1280px;
-    height: 100%;
+    //height: 100%;
+    //background-color: #edf2f7;
     margin: 0 auto;
-    .home-banner {
-      display: flex;
-      width: 100%;
-      height: 500px;
-      margin-bottom: 15px;
-      .home-community {
-        width: 40%;
-        height: 100%;
-        .operation-button {
-          display: inline-block;
-          padding: 6px;
-          color: #d46b08;
-          background: #fff7e6;
-          border: 1px solid #ffd591;
-          border-radius: 15px;
-          cursor: pointer;
-        }
-      }
-    }
     .home-show {
       display: flex;
-      justify-content: space-between;
       height: 800px;
-      padding: 0 6px;
+      padding: 10px 6px 0;
       .home-show-rent,
       .home-show-seek {
-        width: 48%;
-        border: 1px solid #dfdfdf;
-        border-radius: 20px;
-        background-color: #fff7e6;
+        width: 25%;
+
         :deep(.rentOrSeek-list-content) {
           height: calc(100% - 60px);
         }
@@ -237,6 +238,37 @@ export default {
           flex: 0 0 7.5%;
         }
       }
+      .home-community {
+        width: 50%;
+        height: 100%;
+        .operation-button {
+          display: inline-block;
+          padding: 6px;
+          color: #d46b08;
+          background-color: #fff7e6;
+          border: 1px solid #ffd591;
+          border-radius: 15px;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+  .home-banner {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 500px;
+    background-size: 100%;
+    background-position: 50% 50%;
+    &:before {
+      content: "";
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: inherit;
+      filter: blur(16px);
     }
   }
 }

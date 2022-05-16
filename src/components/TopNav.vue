@@ -1,6 +1,10 @@
 <template>
   <div class="login-info">
-    <ul>
+    <div class="login-info-left" @click="geToHome">
+      <img src="/images/garage.png" alt="点击可跳转到首页" />
+      <span>首页</span>
+    </div>
+    <ul class="login-info-right">
       <template v-if="userInfo.id">
         <li>
           <RouterLink to="/my" style="color: #333333">
@@ -35,10 +39,15 @@ export default {
       window.localStorage.removeItem("community-parking");
       router.push("/login");
     };
+    // 跳转到首页
+    const geToHome = () => {
+      router.push("/");
+    };
 
     return {
       userInfo,
       loginOut,
+      geToHome,
     };
   },
 };
@@ -46,13 +55,28 @@ export default {
 
 <style lang="less" scoped>
 .login-info {
-  height: 50px;
+  height: 55px;
   border-bottom: 1px solid #dfdfdf;
-  ul {
+  display: flex;
+  justify-content: space-between;
+  .login-info-left {
+    padding-left: 20px;
+    cursor: pointer;
+    img {
+      width: 55px;
+    }
+    span {
+      font-size: 16px;
+      line-height: 55px;
+      padding-left: 5px;
+    }
+  }
+  .login-info-right {
     height: 100%;
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    margin: 0;
     li {
       padding: 0 20px 0 6px;
       border-left: 2px solid #ff7300;
