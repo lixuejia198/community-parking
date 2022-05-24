@@ -43,7 +43,7 @@ import { defineComponent, reactive } from "vue";
 import { UserOutlined, LockOutlined } from "@ant-design/icons-vue";
 import { checkUsername, checkPassword } from "@/utils/validator";
 import { loginByUsernameAndPassword } from "@/api/user";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { message } from "ant-design-vue";
 
 export default defineComponent({
@@ -77,6 +77,7 @@ export default defineComponent({
     };
     // 获取路由对象
     const router = useRouter();
+    const route = useRoute();
     // 提交表单且数据验证成功后的回调函数
     const onFinish = (values) => {
       // console.log("Success:", values);
@@ -89,8 +90,8 @@ export default defineComponent({
           if (data.status === 200) {
             // 把token存入localStorage中
             window.localStorage.setItem("community-parking", data.token);
-            // 跳转到首页
-            router.push("/");
+            // 跳转到重定向页面或者首页
+            router.push(route.query.redirect || "/");
             // 提示登录成功信息
             message.success(data.msg);
           }
