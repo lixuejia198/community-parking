@@ -469,15 +469,15 @@ export default {
   ::-webkit-scrollbar {
     /*滚动条整体样式*/
     /*高宽分别对应横竖滚动条的尺寸*/
-    width: 7px;
+    width: 0;
     /* height: 4px; */
   }
-  ::-webkit-scrollbar-thumb {
-    /*滚动条里面小方块*/
-    border-radius: 5px;
-    -webkit-box-shadow: inset 0 0 5px rgba(212, 107, 8, 0.7);
-    background: rgba(212, 107, 8, 0.2);
-  }
+  //::-webkit-scrollbar-thumb {
+  //  /*滚动条里面小方块*/
+  //  border-radius: 5px;
+  //  -webkit-box-shadow: inset 0 0 5px rgba(212, 107, 8, 0.7);
+  //  background: rgba(212, 107, 8, 0.2);
+  //}
   height: 100%;
   display: flex;
   .my-left-carport,
@@ -601,6 +601,7 @@ export default {
       }
       p {
         margin-top: 10px;
+        font-size: 16px;
       }
     }
     .car-form-color {
@@ -644,6 +645,7 @@ export default {
       :deep(.ant-list-items) {
         overflow-y: auto;
         height: calc(v-bind(carportListHeight) * 1px);
+        width: 90%;
       }
       :deep(.ant-ribbon-wrapper) {
         width: calc(100% - 8px);
