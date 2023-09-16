@@ -1,4 +1,8 @@
 <template>
+  <div class="container">
+    <!--  用户登录信息  -->
+    <TopNav />
+  </div>
   <div class="my">
     <!--   用户车位信息  -->
     <div class="my-left-carport">
@@ -23,6 +27,17 @@
         >
           <h3 class="carport-number">
             车位编号：<span>{{ carport.pname }}</span>
+            <a-popconfirm
+              title="你确定要解绑该车位吗？"
+              ok-text="确定"
+              cancel-text="取消"
+              placement="bottomRight"
+              @confirm="untieCarport(carport.id)"
+            >
+              <a-button type="primary" danger style="float: right">
+                解绑
+              </a-button>
+            </a-popconfirm>
           </h3>
           <div class="carport-info">
             <span>当前状态：{{ carport.state === 0 ? "空闲" : "使用中" }}</span>
@@ -50,17 +65,17 @@
         </div>
       </div>
     </div>
-    <!--  用户车位车辆添加表单  -->
+    <!--  用户车位车辆绑定表单  -->
     <div class="my-center-operation">
       <!--      <a-empty-->
-      <!--        description="可以点击加号添加车位或车辆哦"-->
+      <!--        description="可以点击加号绑定车位或车辆哦"-->
       <!--        v-show="!isShowCarportForm && !isShowCarForm"-->
       <!--      />-->
       <div class="empty" v-show="!isShowCarportForm && !isShowCarForm">
         <img src="/images/box.png" alt="" />
-        <p>可以点击“ + ”添加车位或车辆哦</p>
+        <p>可以点击“ + ”绑定车位或车辆哦</p>
       </div>
-      <!--  用户添加车位表单  -->
+      <!--  用户绑定车位表单  -->
       <a-form
         name="carport-form"
         :model="carportFormState"
@@ -117,7 +132,7 @@
                 }"
               >
                 <a-popconfirm
-                  title="你确定要添加该车位吗？"
+                  title="你确定要绑定该车位吗？"
                   ok-text="确定"
                   cancel-text="取消"
                   placement="bottomRight"
@@ -139,10 +154,10 @@
                     <a-list-item-meta>
                       <template #description>
                         地址：<span>{{ item.place }}</span>
-                        当前状态：
-                        <span>
-                          {{ item.state === 0 ? "空闲" : "使用中" }}
-                        </span>
+                        <!--                        当前状态：-->
+                        <!--                        <span>-->
+                        <!--                          {{ item.state === 0 ? "空闲" : "使用中" }}-->
+                        <!--                        </span>-->
                       </template>
                       <template #title>
                         <span>{{ item.pname }}</span>
@@ -155,7 +170,7 @@
           </a-list>
         </a-form-item>
       </a-form>
-      <!--  用户添加车辆表单  -->
+      <!--  用户绑定车辆表单  -->
       <a-form
         name="car-form"
         :rules="carFormRules"
@@ -179,7 +194,7 @@
           </div>
         </a-form-item>
         <a-form-item :wrapper-col="{ offset: 4 }">
-          <a-button type="primary" html-type="submit">添加车辆</a-button>
+          <a-button type="primary" html-type="submit">绑定车辆</a-button>
         </a-form-item>
       </a-form>
     </div>
@@ -202,6 +217,17 @@
         <div class="my-right-car-item" v-for="car in carList" :key="car.id">
           <h3 class="car-number">
             车牌号：<span>{{ car.cname }}</span>
+            <a-popconfirm
+              title="你确定要解绑该车辆吗？"
+              ok-text="确定"
+              cancel-text="取消"
+              placement="bottomRight"
+              @confirm="untieCar(car.id)"
+            >
+              <a-button type="primary" danger style="float: right">
+                解绑
+              </a-button>
+            </a-popconfirm>
           </h3>
           <div class="car-info">
             <span>
@@ -234,16 +260,21 @@ import { computed, ref } from "vue";
 import { getUserInfo } from "@/utils/getUserInfo";
 import { useCarList } from "@/hooks/useCarList";
 import { getCommunityList } from "@/api";
-import { userBindCarportApi, getCarportLogApi } from "@/api/carport";
+import {
+  userBindCarportApi,
+  getCarportLogApi,
+  untieCarportByIDApi,
+} from "@/api/carport";
 import { message } from "ant-design-vue";
 import { checkCarName } from "@/utils/validator";
-import { addCarByUserIDApi, getCarLogApi } from "@/api/car";
+import { addCarByUserIDApi, getCarLogApi, untieCarByIDApi } from "@/api/car";
+import TopNav from "@/components/TopNav";
 import SeekItem from "@/views/community/components/seekItem";
 import RentItem from "@/views/community/components/rentItem";
 
 export default {
   name: "My",
-  components: { RentItem, SeekItem },
+  components: { RentItem, SeekItem, TopNav },
   setup() {
     const userInfo = ref(getUserInfo());
     // 控制车位列表与车位日志切换
@@ -328,11 +359,24 @@ export default {
         console.log(data, "data");
         if (data.status === 200) {
           getCarportData({ uid: userInfo.value.id });
-          message.success("添加车位成功");
+          message.success("绑定车位成功");
         }
       });
     };
-    // 控制用户添加车位表单的显示与隐藏
+    const untieCarport = (id) => {
+      untieCarportByIDApi({ id }).then((data) => {
+        if (data.status === 200) {
+          // 提示信息
+          message.success(data.msg);
+          // 刷新用户车辆列表
+          getCarportData({ uid: userInfo.value.id });
+        }
+        if (data.status === 0) {
+          message.success(data.msg);
+        }
+      });
+    };
+    // 控制用户绑定车位表单的显示与隐藏
     const isShowCarportForm = ref(false);
     const changeCarportForm = () => {
       isShowCarportForm.value = true;
@@ -374,13 +418,13 @@ export default {
       // console.log(currentCarColor.value);
       // console.log(carFormState.value, "carFormState");
     };
-    // 控制用户添加车辆表单的显示与隐藏
+    // 控制用户绑定车辆表单的显示与隐藏
     const isShowCarForm = ref(false);
     const changeCarForm = () => {
       isShowCarForm.value = true;
       isShowCarportForm.value = false;
     };
-    // 提交用户添加车辆表单且数据验证成功后回调事件
+    // 提交用户绑定车辆表单且数据验证成功后回调事件
     const carFormFinish = (values) => {
       // console.log(values);
       addCarByUserIDApi({
@@ -395,6 +439,20 @@ export default {
           carFormState.value = { cname: "", color: "" };
           // 取消当前车颜色项的选中
           currentCarColor.value = "";
+          // 刷新用户车辆列表
+          getCarData({ uid: userInfo.value.id });
+        }
+        if (data.status === 0) {
+          message.success(data.msg);
+        }
+      });
+    };
+    // 解绑车辆
+    const untieCar = (id) => {
+      untieCarByIDApi({ id }).then((data) => {
+        if (data.status === 200) {
+          // 提示信息
+          message.success(data.msg);
           // 刷新用户车辆列表
           getCarData({ uid: userInfo.value.id });
         }
@@ -457,6 +515,8 @@ export default {
       carLogData,
       getCarportLogByUid,
       carportLogData,
+      untieCar,
+      untieCarport,
       carportListHeight: computed(() => window.innerHeight - 250),
     };
   },
@@ -464,6 +524,44 @@ export default {
 </script>
 
 <style scoped lang="less">
+.home {
+  //height: 100%;
+  .container {
+    width: 1280px;
+    //height: 100%;
+    //background-color: #edf2f7;
+    margin: 0 auto;
+    .home-show {
+      display: flex;
+      height: 800px;
+      padding: 10px 6px 0;
+      .home-show-rent,
+      .home-show-seek {
+        width: 25%;
+
+        :deep(.rentOrSeek-list-content) {
+          height: calc(100% - 60px);
+        }
+        :deep(.rentOrSeek-list-content-col3) {
+          flex: 0 0 7.5%;
+        }
+      }
+      .home-community {
+        width: 50%;
+        height: 100%;
+        .operation-button {
+          display: inline-block;
+          padding: 6px;
+          color: #d46b08;
+          background-color: #fff7e6;
+          border: 1px solid #ffd591;
+          border-radius: 15px;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}
 .my {
   overflow: hidden;
   ::-webkit-scrollbar {
@@ -480,6 +578,8 @@ export default {
   //}
   height: 100%;
   display: flex;
+  margin-top: -55px;
+  padding-top: 55px;
   .my-left-carport,
   .my-right-car {
     position: relative;
@@ -590,6 +690,7 @@ export default {
     border-radius: 30px;
     border: 3px solid #ffd591;
     padding: 30px 30px 0;
+    overflow: hidden;
     :deep(.ant-empty) {
       margin: 122px 8px 0;
     }

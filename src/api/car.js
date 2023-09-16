@@ -45,6 +45,15 @@ export function addCarByUserIDApi({ uid, cname, color }) {
 }
 
 /**
+ * 解绑车辆
+ * @param id 车辆id
+ * @returns {Promise}
+ */
+export function untieCarByIDApi({ id }) {
+  return requestWithToken("/car/untie", "post", { id });
+}
+
+/**
  * 查询车辆日志
  * @param uid 用户id
  * @param cid 车辆id

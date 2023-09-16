@@ -12,11 +12,11 @@ const cameraControls = (renderer, scene, camera) => {
 
   // 用户输入配置
   // 左键
-  cameraControls.mouseButtons.left = CameraControls.ACTION.NONE;
+  cameraControls.mouseButtons.left = CameraControls.ACTION.TRUCK;
   // 右键
-  cameraControls.mouseButtons.right = CameraControls.ACTION.TRUCK;
+  cameraControls.mouseButtons.right = CameraControls.ACTION.ROTATE;
   // 中键
-  cameraControls.mouseButtons.middle = CameraControls.ACTION.ROTATE;
+  cameraControls.mouseButtons.middle = CameraControls.ACTION.NONE;
 
   const renderCamera = () => {
     // 判断相机控制器是否有更新
