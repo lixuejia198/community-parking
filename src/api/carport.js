@@ -46,6 +46,15 @@ export function userBindCarportApi({ pid, uid }) {
   return requestWithToken("/carport/bind_user", "post", { pid, uid });
 }
 
+/***
+ * 解绑车位
+ * @param id 车位id
+ * @returns {Promise}
+ */
+export function untieCarportByIDApi({ id }) {
+  return requestWithToken("/carport/untie", "post", { id });
+}
+
 /**
  * 使用车位
  * @param id 车位共享id
